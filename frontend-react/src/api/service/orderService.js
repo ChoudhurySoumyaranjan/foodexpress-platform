@@ -1,0 +1,45 @@
+import api from "../axiosInstance";
+
+export const placeOrderApi = async (data) => {
+  return await api.post("/api/orders/place", data);
+};
+
+export const getOrdersOfUser = async () => {
+  return await api.get(`/api/orders`);
+};
+
+export const getAllOrders = async () => {
+  return await api.get(`/admin/api/orders/all`);
+};
+
+export const getOrderById = async (orderId) => {
+  return await api.get(`/api/orders/${orderId}`);
+};
+
+export const getUserOrdersApi = async (userId) => {
+  return await api.get(`/api/orders/user/${userId}`);
+};
+
+export const getAllPaymentTypes = async () => {
+  return await api.get("/api/orders/payment/types");
+};
+
+export const getAllOrderStatus = async () => {
+  return await api.get("/api/orders/statuses");
+};
+
+export const updateOrderStatus = async (orderId, status) => {
+  return await api.patch(`/admin/api/orders/${orderId}?status=${status}`);
+};
+
+export const getFilteredOrders = async (keyword) => {
+  return await api.get(`/admin/api/orders?keyword=${keyword}`);
+};
+
+export const getTotalOrderdAmount = async () => {
+  return await api.get(`/admin/api/orders/amount`);
+};
+
+export const getTotalOrderCount = async () => {
+  return await api.get(`/admin/api/orders/count`);
+};

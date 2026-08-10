@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Confirmation</title>
+</head>
+
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+    <tr>
+        <td align="center">
+
+            <table width="650" cellpadding="0" cellspacing="0"
+                   style="background:#ffffff;border-radius:10px;overflow:hidden;">
+
+                <!-- Header -->
+                <tr>
+                    <td align="center"
+                        style="background:#ff6b00;padding:25px;color:white;">
+
+                        <h1 style="margin:0;">
+                            🍔 Food Ordering App
+                        </h1>
+
+                        <p style="margin-top:10px;">
+                            Thank you for your order!
+                        </p>
+
+                    </td>
+                </tr>
+
+                <!-- Greeting -->
+                <tr>
+                    <td style="padding:30px;">
+
+                        <h2 style="margin-top:0;">
+                            Hello {{name}},
+                        </h2>
+
+                        <p>
+                            Your order has been placed successfully.
+                        </p>
+
+                        <p>
+                            Below are your order details.
+                        </p>
+
+                    </td>
+                </tr>
+
+                <!-- Order Details -->
+                <tr>
+                    <td style="padding:0 30px;">
+
+                        <table width="100%" cellpadding="8"
+                               style="border-collapse:collapse;">
+
+                            <tr>
+                                <td><b>Order ID</b></td>
+                                <td>{{orderId}}</td>
+                            </tr>
+
+                            <tr>
+                                <td><b>Order Date</b></td>
+                                <td>{{orderDate}}</td>
+                            </tr>
+
+                            <tr>
+                                <td><b>Status</b></td>
+                                <td>{{status}}</td>
+                            </tr>
+
+                            <tr>
+                                <td><b>Payment Method</b></td>
+                                <td>{{paymentMethod}}</td>
+                            </tr>
+
+                            <tr>
+                                <td><b>Delivery Address</b></td>
+                                <td>{{deliveryAddress}}</td>
+                            </tr>
+
+                        </table>
+
+                    </td>
+                </tr>
+
+                <!-- Items -->
+                <tr>
+                    <td style="padding:30px;">
+
+                        <h3>Order Items</h3>
+
+                        <table width="100%"
+                               cellpadding="10"
+                               cellspacing="0"
+                               style="border-collapse:collapse;">
+
+                            <thead>
+
+                            <tr style="background:#ff6b00;color:white;">
+
+                                <th align="left">Food</th>
+
+                                <th align="center">Qty</th>
+
+                                <th align="right">Price</th>
+
+                            </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                            {{orderItems}}
+
+                            </tbody>
+
+                        </table>
+
+                    </td>
+                </tr>
+
+                <!-- Total -->
+                <tr>
+
+                    <td align="right"
+                        style="padding:0 30px 30px;">
+
+                        <h2 style="color:#ff6b00;">
+                            Total : {{totalAmount}}
+                        </h2>
+
+                    </td>
+
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+
+                    <td
+                            align="center"
+                            style="background:#fafafa;padding:25px;color:#777;">
+
+                        <p>
+                            Thank you for ordering with us.
+                        </p>
+
+                        <p>
+                            We hope you enjoy your meal!
+                        </p>
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+
+</table>
+
+</body>
+</html>

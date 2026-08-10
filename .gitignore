@@ -1,0 +1,50 @@
+# ==============================
+# IntelliJ IDEA - Spring Boot
+# ==============================
+backend-spring/.idea/
+backend-spring/*.iml
+
+# ==============================
+# Maven
+# ==============================
+backend-spring/target/
+
+# ==============================
+# Java
+# ==============================
+*.class
+
+# ==============================
+# Logs
+# ==============================
+*.log
+
+# ==============================
+# Spring Boot local configuration
+# ==============================
+backend-spring/src/main/resources/application.properties
+backend-spring/src/main/resources/application-docker.properties
+# ==============================
+# React / Node
+# ==============================
+frontend-react/node_modules/
+frontend-react/dist/
+frontend-react/build/
+
+# ==============================
+# Environment / Secrets
+# ==============================
+.env
+.env.*
+!.env.example
+
+# ==============================
+# VS Code
+# ==============================
+.vscode/
+
+# ==============================
+# OS files
+# ==============================
+.DS_Store
+Thumbs.db
