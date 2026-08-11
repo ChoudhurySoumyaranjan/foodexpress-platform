@@ -3,13 +3,13 @@ import { CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import UserCardDetails from "../components/UserCardDetails";
+import UserCardDetails from "../../components/UserCardDetails";
 
 import {
   getAllUsers,
   blockUser,
   unblockUser,
-} from "../api/service/userService";
+} from "../../api/service/userService";
 
 const AdminUserManagementPage = () => {
   const [users, setUsers] = useState([]);

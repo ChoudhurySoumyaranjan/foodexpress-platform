@@ -4,10 +4,10 @@ import {
   addCategory,
   editCategory,
   getCategories,
-} from "../api/service/categoryService";
+} from "../../api/service/categoryService";
 
-import Category from "../components/Category";
-import Loader from "../components/Loader";
+import Category from "../../components/Category";
+import Loader from "../../components/Loader";
 import { ImagePlus, X } from "lucide-react";
 
 export default function AdminCategoryPage() {

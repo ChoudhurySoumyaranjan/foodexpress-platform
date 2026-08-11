@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import {
   fetchAllSubjects,
   saveContactUsDetails,
-} from "../api/service/contactUsService";
+} from "../../api/service/contactUsService";
 
 export default function ContactUsPage() {
   const [subjects, setSubjects] = useState([]);

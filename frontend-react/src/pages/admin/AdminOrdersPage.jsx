@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
-import AdminOrderCard from "../components/AdminOrderCard";
-import { getAllOrders, getFilteredOrders } from "../api/service/orderService";
+import AdminOrderCard from "../../components/AdminOrderCard";
+import { getAllOrders, getFilteredOrders } from "../../api/service/orderService";
 import { Search } from "@mui/icons-material";
 
 const AdminOrdersPage = () => {

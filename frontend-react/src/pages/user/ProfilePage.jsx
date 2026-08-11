@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   getUserInformation,
   updateUserDetails,
-} from "../api/service/userService";
+} from "../../api/service/userService";
 
 import {
   User,
@@ -17,7 +17,7 @@ import {
   Lock,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import ChangePasswordModal from "../components/ChangePasswordModal";
+import ChangePasswordModal from "../../components/ChangePasswordModal";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);

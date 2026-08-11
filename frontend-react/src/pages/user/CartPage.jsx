@@ -1,8 +1,8 @@
 import { ShoppingCart } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import CartItem from "../components/CartItem";
-import { DELIVERY_FEE, PLATFORM_FEE } from "../utils/constants";
+import CartItem from "../../components/CartItem";
+import { DELIVERY_FEE, PLATFORM_FEE } from "../../utils/constants";
 
 const CartPage = () => {
   const navigate = useNavigate();

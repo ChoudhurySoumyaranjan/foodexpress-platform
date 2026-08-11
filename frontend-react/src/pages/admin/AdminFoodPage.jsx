@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { getCategories } from "../api/service/categoryService";
-import { addFood, fetchAllFoods, updateFood } from "../api/service/foodService";
-import Food from "../components/Food";
-import Loader from "../components/Loader";
+import { getCategories } from "../../api/service/categoryService";
+import { addFood, fetchAllFoods, updateFood } from "../../api/service/foodService";
+import Food from "../../components/Food";
+import Loader from "../../components/Loader";
 import { ImagePlus, X } from "lucide-react";
 
 export default function AdminFoodPage() {

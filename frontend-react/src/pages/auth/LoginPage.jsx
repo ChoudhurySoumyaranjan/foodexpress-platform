@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { loginUser } from "../api/service/authService";
+import { loginUser } from "../../api/service/authService";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../redux/slice/authSlice";
 import { useNavigate, Link } from "react-router-dom";
-import { fetchCart } from "../redux/thunks/cartThunk";
-import { addToCartApi } from "../api/service/cartService";
+import { addToCartApi } from "../../api/service/cartService";
+import { loginSuccess } from "../../redux/slice/authSlice";
+import { fetchCart } from "../../redux/thunks/cartThunk";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({

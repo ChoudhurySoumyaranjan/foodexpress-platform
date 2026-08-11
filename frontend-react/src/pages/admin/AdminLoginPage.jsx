@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import logo from "../assets/foodexpresslogo.png";
-import { loginUser } from "../api/service/authService";
-import { loginSuccess } from "../redux/slice/authSlice";
+import logo from "../../assets/foodexpresslogo.png";
+import { loginUser } from "../../api/service/authService";
+import { loginSuccess } from "../../redux/slice/authSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 

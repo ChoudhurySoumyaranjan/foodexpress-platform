@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { fetchFoodsByCategory } from "../api/service/foodService";
-import FoodCard from "../components/FoodCard"; // adjust path
+import { fetchFoodsByCategory } from "../../api/service/foodService";
+import FoodCard from "../../components/FoodCard"; // adjust path
 import { SlidersHorizontal, SearchX } from "lucide-react";
 
 export default function FoodByCategoryPage() {

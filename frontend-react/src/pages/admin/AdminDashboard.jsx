@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import logo from "../assets/foodexpresslogo.png";
+import logo from "../../assets/foodexpresslogo.png";
 import {
   Menu,
   LayoutDashboard,
@@ -20,19 +20,19 @@ import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
-import { totalUsersCount } from "../api/service/userService";
+import { totalUsersCount } from "../../api/service/userService";
 import {
   getTotalOrderCount,
   getTotalOrderdAmount,
-} from "../api/service/orderService";
+} from "../../api/service/orderService";
 import {
   getTotalPendingQueryCount,
   getTotalQueryCount,
-} from "../api/service/contactUsService";
-import { logoutUser } from "../api/service/authService";
+} from "../../api/service/contactUsService";
+import { logoutUser } from "../../api/service/authService";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../redux/slice/authSlice";
-import { clearCart } from "../redux/slice/cartSlice";
+import { logout } from "../../redux/slice/authSlice";
+import { clearCart } from "../../redux/slice/cartSlice";
 
 export default function Dashboard() {
   const [open, setOpen] = useState(true);
