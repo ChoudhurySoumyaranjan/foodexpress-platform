@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Search, Inbox } from "lucide-react";
-import QueryDetailsModal from "../components/QueryDetailsModal";
+import QueryDetailsModal from "../../components/QueryDetailsModal";
 import {
   getAllContactUsMessage,
   getFilteredContactUsMessage,
-} from "../api/service/contactUsService";
+} from "../../api/service/contactUsService";
 import { toast } from "react-toastify";
 
 export default function AdminQueryManagementPage() {

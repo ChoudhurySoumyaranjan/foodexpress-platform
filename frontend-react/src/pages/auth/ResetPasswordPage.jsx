@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Lock } from "lucide-react";
 import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { resetPassword } from "../api/service/authService";
-
+import { resetPassword } from "../../api/service/authService";
 const ResetPasswordPage = () => {
   const [loading, setLoading] = useState(false);
 

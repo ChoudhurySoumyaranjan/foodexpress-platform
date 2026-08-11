@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
-import { getCategories } from "../api/service/categoryService";
-import { fetchFoodsByCategory, fetchFoodsByKeyword } from "../api/service/foodService";
-import FoodCard from "../components/FoodCard";
+import { getCategories } from "../../api/service/categoryService";
+import { fetchFoodsByCategory, fetchFoodsByKeyword } from "../../api/service/foodService";
+import FoodCard from "../../components/FoodCard";
 
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");

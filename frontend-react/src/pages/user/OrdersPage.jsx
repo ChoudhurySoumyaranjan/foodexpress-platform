@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { getOrdersOfUser } from "../api/service/orderService";
+import { getOrdersOfUser } from "../../api/service/orderService";
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);

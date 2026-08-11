@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { clearCart } from "../redux/slice/cartSlice";
-import { getAllPaymentTypes, placeOrderApi } from "../api/service/orderService";
-import loadRazorpay from "../utils/loadRazorpay";
+import { clearCart } from "../../redux/slice/cartSlice";
+import { getAllPaymentTypes, placeOrderApi } from "../../api/service/orderService";
+import loadRazorpay from "../../utils/loadRazorpay";
 
 import {
   createPaymentOrderApi,
   verifyPaymentApi,
-} from "../api/service/paymentService";
-import { DELIVERY_FEE, PLATFORM_FEE } from "../utils/constants";
+} from "../../api/service/paymentService";
+import { DELIVERY_FEE, PLATFORM_FEE } from "../../utils/constants";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
