@@ -11,6 +11,8 @@ import com.lucky.main.repository.ContactMessageRepository;
 import com.lucky.main.service.ContactMessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -58,14 +60,12 @@ public class ContactMessageServiceImpl implements ContactMessageService {
     }
 
     @Override
-    public List<ContactMessageResponse> getAllContactMessages() {
+    public Page<ContactMessageResponse> getAllContactMessages(Pageable pageable) {
 
         try {
+            return contactMessageRepository.findAll(pageable)
+                    .map(contactMessage -> ContactMessageMapper.toResponse(contactMessage));
 
-            return contactMessageRepository.findAll()
-                    .stream()
-                    .map((contactMessage -> ContactMessageMapper.toResponse(contactMessage)))
-                    .collect(Collectors.toList());
         } catch (Exception e) {
             throw new ContactUsException("Failed to get contact messages");
         }
@@ -93,16 +93,13 @@ public class ContactMessageServiceImpl implements ContactMessageService {
 
     @Override
     @Transactional
-    public List<ContactMessageResponse> getfilteredContactMessages(String keyword) {
+    public Page<ContactMessageResponse> getfilteredContactMessages(String keyword,Pageable pageable) {
         if (keyword == null || keyword.isBlank()) {
-            return contactMessageRepository.findAll()
-                    .stream()
-                    .map((contactMessage) -> ContactMessageMapper.toResponse(contactMessage))
-                    .collect(Collectors.toList());
+            return contactMessageRepository.findAll(pageable)
+                    .map((contactMessage) -> ContactMessageMapper.toResponse(contactMessage));
         } else {
-            return contactMessageRepository.searchMessages(keyword.trim())
-                    .stream().map((contactMessage) -> ContactMessageMapper.toResponse(contactMessage))
-                    .collect(Collectors.toList());
+            return contactMessageRepository.searchMessages(keyword.trim(),pageable)
+                    .map((contactMessage) -> ContactMessageMapper.toResponse(contactMessage));
         }
     }
 

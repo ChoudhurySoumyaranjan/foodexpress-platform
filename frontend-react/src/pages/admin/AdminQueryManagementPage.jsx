@@ -1,62 +1,89 @@
 import React, { useEffect, useState } from "react";
 import { Search, Inbox } from "lucide-react";
 import QueryDetailsModal from "../../components/QueryDetailsModal";
+
 import {
   getAllContactUsMessage,
   getFilteredContactUsMessage,
 } from "../../api/service/contactUsService";
+
 import { toast } from "react-toastify";
 
 export default function AdminQueryManagementPage() {
   const [selectedQuery, setSelectedQuery] = useState(null);
+
   const [queries, setQueries] = useState([]);
+
   const [selectedStatus, setSelectedStatus] = useState("ALL");
+
   const [loading, setLoading] = useState(true);
+
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const fetchAllQueries = async () => {
-    try {
-      const response = await getAllContactUsMessage();
-      setQueries(response.data || []);
-    } catch (error) {
-      console.log(error.response?.data);
-      toast.info("Failed to Fetch All Tickets");
-    } finally {
-      setLoading(false);
-    }
-  };
-  const filteredQueries =
-    selectedStatus === "ALL"
-      ? queries
-      : queries.filter((query) => query.status === selectedStatus);
+  // Spring Boot pagination is 0-based
+  const [currentPage, setCurrentPage] = useState(0);
 
-  const filterQueries = async () => {
+  const [pageSize, setPageSize] = useState(0);
+
+  // Total number of pages returned by backend
+  const [totalPages, setTotalPages] = useState(0);
+
+  const fetchQueries = async () => {
     try {
       setLoading(true);
 
       let response;
 
+      // No search keyword
       if (searchKeyword.trim() === "") {
-        response = await getAllContactUsMessage();
-      } else {
-        response = await getFilteredContactUsMessage(searchKeyword);
+        response = await getAllContactUsMessage(currentPage, pageSize);
       }
 
-      setQueries(response.data || []);
+      // Search keyword exists
+      else {
+        response = await getFilteredContactUsMessage(
+          searchKeyword.trim(),
+          currentPage,
+          pageSize,
+        );
+      }
+
+      const pageData = response.data;
+
+      // Page.content contains the actual tickets
+      setQueries(pageData.content || []);
+
+      // Total number of pages
+      setTotalPages(pageData.totalPages || 0);
+      setPageSize(pageData.size);
     } catch (error) {
       console.log(error.response?.data);
-      toast.info("Failed to Fetch Tickets");
+
+      toast.error("Failed to fetch tickets");
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      filterQueries();
+      fetchQueries();
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [searchKeyword]);
+  }, [currentPage, searchKeyword]);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+
+    setSearchKeyword(value);
+    setCurrentPage(0);
+  };
+
+  const filteredQueries =
+    selectedStatus === "ALL"
+      ? queries
+      : queries.filter((query) => query.status === selectedStatus);
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -81,9 +108,26 @@ export default function AdminQueryManagementPage() {
     setSelectedQuery(data);
   };
 
+  const handlePrevious = () => {
+    if (currentPage > 0) {
+      setCurrentPage((prev) => {
+        return prev - 1;
+      });
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage((prev) => {
+        return prev + 1;
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* HEADER */}
+
       <div className="rounded-3xl border border-gray-200 bg-white px-8 py-7 shadow-sm">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -106,10 +150,12 @@ export default function AdminQueryManagementPage() {
         </div>
       </div>
 
-      {/* Search & Filter */}
+      {/* SEARCH & FILTER */}
+
       <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          {/* Search */}
+          {/* SEARCH */}
+
           <div className="relative w-full lg:w-96">
             <Search
               size={18}
@@ -120,44 +166,59 @@ export default function AdminQueryManagementPage() {
               type="text"
               placeholder="Search customer, email or subject..."
               value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full rounded-xl border border-gray-300 bg-gray-50 py-3 pl-11 pr-4 text-sm transition focus:border-[#FC8019] focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100"
             />
           </div>
 
-          {/* Status */}
+          {/* STATUS */}
+
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-[#FC8019] focus:ring-4 focus:ring-orange-100"
           >
             <option value="ALL">All Status</option>
+
             <option value="OPEN">Open</option>
+
             <option value="IN_PROGRESS">In Progress</option>
+
             <option value="RESOLVED">Resolved</option>
+
             <option value="CLOSED">Closed</option>
           </select>
         </div>
       </div>
 
-      {/* Table */}
+      {/* TABLE */}
+
       <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="min-w-full">
-            {/* Table Head */}
+            {/* TABLE HEAD */}
+
             <thead className="bg-gray-50">
               <tr className="border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
                 <th className="px-6 py-4 text-left">ID</th>
+
                 <th className="px-6 py-4 text-left">Customer</th>
+
                 <th className="px-6 py-4 text-left">Subject</th>
+
                 <th className="px-6 py-4 text-center">Status</th>
+
                 <th className="px-6 py-4 text-left">Created</th>
+
                 <th className="px-6 py-4 text-center">Action</th>
               </tr>
             </thead>
 
+            {/* TABLE BODY */}
+
             <tbody>
-              {/* Loading */}
+              {/* LOADING */}
+
               {loading && (
                 <tr>
                   <td colSpan={6}>
@@ -168,7 +229,8 @@ export default function AdminQueryManagementPage() {
                 </tr>
               )}
 
-              {/* Empty */}
+              {/* EMPTY */}
+
               {!loading && filteredQueries.length === 0 && (
                 <tr>
                   <td colSpan={6}>
@@ -189,7 +251,8 @@ export default function AdminQueryManagementPage() {
                 </tr>
               )}
 
-              {/* Data */}
+              {/* DATA */}
+
               {!loading &&
                 filteredQueries.map((query) => (
                   <tr
@@ -197,13 +260,15 @@ export default function AdminQueryManagementPage() {
                     className="border-b border-gray-100 transition hover:bg-orange-50/40"
                   >
                     {/* ID */}
+
                     <td className="px-6 py-5">
                       <span className="font-semibold text-gray-700">
                         #{query.id}
                       </span>
                     </td>
 
-                    {/* Customer */}
+                    {/* CUSTOMER */}
+
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FC8019] font-semibold text-white">
@@ -227,7 +292,8 @@ export default function AdminQueryManagementPage() {
                       </div>
                     </td>
 
-                    {/* Subject */}
+                    {/* SUBJECT */}
+
                     <td className="px-6 py-5">
                       <p className="max-w-xs font-medium text-gray-700">
                         {query.subject
@@ -237,23 +303,26 @@ export default function AdminQueryManagementPage() {
                       </p>
                     </td>
 
-                    {/* Status */}
+                    {/* STATUS */}
+
                     <td className="px-6 py-5 text-center">
                       <span
                         className={`inline-flex min-w-[120px] justify-center rounded-full px-3 py-1.5 text-xs font-semibold ${getStatusStyle(
                           query.status,
                         )}`}
                       >
-                        {query.status.replace("_", " ")}
+                        {query.status?.replace(/_/g, " ")}
                       </span>
                     </td>
 
-                    {/* Date */}
+                    {/* DATE */}
+
                     <td className="whitespace-nowrap px-6 py-5 text-sm text-gray-600">
                       {query.createdAt}
                     </td>
 
-                    {/* Action */}
+                    {/* ACTION */}
+
                     <td className="px-6 py-5">
                       <div className="flex justify-center">
                         <button
@@ -269,14 +338,72 @@ export default function AdminQueryManagementPage() {
             </tbody>
           </table>
         </div>
+
+        {/* PAGINATION */}
+
+        {!loading && totalPages > 0 && (
+          <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
+            {/* Page information */}
+            <p className="text-sm text-gray-500">
+              Page{" "}
+              <span className="font-semibold text-gray-700">
+                {currentPage + 1}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-gray-700">{totalPages}</span>
+            </p>
+
+            {/* Pagination */}
+            <div className="flex items-center gap-2">
+              {/* Previous */}
+              <button
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+                disabled={currentPage === 0}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium
+                   text-gray-700 hover:bg-gray-50
+                   disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Previous
+              </button>
+
+              {/* Page Numbers */}
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentPage(index)}
+                  className={`rounded-lg px-4 py-2 text-sm font-medium
+            ${
+              currentPage === index
+                ? "bg-[#FC8019] text-white"
+                : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+            }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              {/* Next */}
+              <button
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+                disabled={currentPage === totalPages - 1}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium
+                   text-gray-700 hover:bg-gray-50
+                   disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Modal */}
+      {/* MODAL */}
+
       {selectedQuery && (
         <QueryDetailsModal
           selectedQuery={selectedQuery}
           setSelectedQuery={setSelectedQuery}
-          fetchAllQueries={fetchAllQueries}
+          fetchAllQueries={fetchQueries}
         />
       )}
     </div>

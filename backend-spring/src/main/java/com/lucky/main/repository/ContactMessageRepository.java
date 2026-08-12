@@ -3,6 +3,7 @@ package com.lucky.main.repository;
 import com.lucky.main.dto.RecentQueryDTO;
 import com.lucky.main.entity.ContactMessage;
 import com.lucky.main.enums.TicketStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,7 +25,7 @@ public interface ContactMessageRepository extends JpaRepository<ContactMessage, 
                     OR LOWER(c.message) LIKE LOWER(CONCAT('%', :keyword, '%'))
                 ORDER BY c.createdAt DESC
             """)
-    List<ContactMessage> searchMessages(@Param("keyword") String keyword);
+    Page<ContactMessage> searchMessages(@Param("keyword") String keyword, Pageable pageable);
 
     long countByStatusIn(Collection<TicketStatus> statuses);
 

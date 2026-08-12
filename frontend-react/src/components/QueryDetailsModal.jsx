@@ -1,13 +1,24 @@
 import { useEffect, useState } from "react";
+
 import {
   getAllTicketStatus,
   updateContactUsMessageStatus,
 } from "../api/service/contactUsService";
+
 import { toast } from "react-toastify";
 
-const QueryDetailsModal = ({ selectedQuery, setSelectedQuery,fetchAllQueries }) => {
+const QueryDetailsModal = ({
+  selectedQuery,
+  setSelectedQuery,
+  fetchAllQueries,
+}) => {
   const [statuses, setStatuses] = useState([]);
+
   const [selectedStatus, setSelectedStatus] = useState("");
+
+  // --------------------------------------------------
+  // FETCH STATUSES
+  // --------------------------------------------------
 
   useEffect(() => {
     setSelectedStatus(selectedQuery.status);
@@ -15,9 +26,11 @@ const QueryDetailsModal = ({ selectedQuery, setSelectedQuery,fetchAllQueries }) 
     const fetchStatus = async () => {
       try {
         const response = await getAllTicketStatus();
+
         setStatuses(response.data || []);
       } catch (error) {
         console.log(error.response?.data);
+
         toast.error("Failed to fetch statuses");
       }
     };
@@ -25,203 +38,161 @@ const QueryDetailsModal = ({ selectedQuery, setSelectedQuery,fetchAllQueries }) 
     fetchStatus();
   }, [selectedQuery]);
 
-  const handleTicketStatusUpdate = async (id, status) => {
+  // --------------------------------------------------
+  // UPDATE STATUS
+  // --------------------------------------------------
+
+  const handleTicketStatusUpdate = async () => {
     try {
-      const response = await updateContactUsMessageStatus(id, status);
+      const response = await updateContactUsMessageStatus(
+        selectedQuery.id,
+        selectedStatus,
+      );
 
       if (response.status === 200) {
-        fetchAllQueries();
         toast.success("Ticket status updated");
+
+        // Update modal immediately
 
         setSelectedQuery({
           ...selectedQuery,
-          status: status,
+          status: selectedStatus,
         });
+
+        // Refresh current pagination page
+
+        await fetchAllQueries();
       }
     } catch (error) {
       console.log(error.response?.data);
+
       toast.error("Failed to update status");
     }
   };
 
   return (
-    <div
-      className="
-      fixed
-      inset-0
-      bg-black/40
-      flex
-      items-center
-      justify-center
-      z-50
-      p-4
-    "
-    >
-      <div
-        className="
-        bg-white
-        w-full
-        max-w-2xl
-        rounded-2xl
-        shadow-xl
-        overflow-hidden
-      "
-      >
-        {/* Header */}
-        <div
-          className="
-          flex
-          items-center
-          justify-between
-          px-6
-          py-4
-          border-b
-          border-gray-200
-        "
-        >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-xl">
+        {/* HEADER */}
+
+        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <div>
             <h2 className="text-xl font-bold text-gray-800">Query Details</h2>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="mt-1 text-sm text-gray-500">
               Ticket ID #{selectedQuery.id}
             </p>
           </div>
 
           <button
             onClick={() => setSelectedQuery(null)}
-            className="
-            text-gray-500
-            hover:text-black
-            text-xl
-            font-bold
-          "
+            className="text-xl font-bold text-gray-500 hover:text-black"
           >
             ✕
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-6 space-y-6">
-          {/* User Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* BODY */}
+
+        <div className="space-y-6 p-6">
+          {/* USER INFORMATION */}
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            {/* NAME */}
+
             <div>
               <p className="text-sm text-gray-500">Full Name</p>
 
-              <h3 className="font-semibold text-gray-800 mt-1">
+              <h3 className="mt-1 font-semibold text-gray-800">
                 {selectedQuery.fullName}
               </h3>
             </div>
 
+            {/* EMAIL */}
+
             <div>
               <p className="text-sm text-gray-500">Email</p>
 
-              <h3 className="font-semibold text-gray-800 mt-1">
+              <h3 className="mt-1 font-semibold text-gray-800">
                 {selectedQuery.email}
               </h3>
             </div>
 
+            {/* PHONE */}
+
             <div>
               <p className="text-sm text-gray-500">Phone Number</p>
 
-              <h3 className="font-semibold text-gray-800 mt-1">
+              <h3 className="mt-1 font-semibold text-gray-800">
                 {selectedQuery.phoneNumber}
               </h3>
             </div>
 
+            {/* ORDER ID */}
+
             <div>
               <p className="text-sm text-gray-500">Order ID</p>
 
-              <h3 className="font-semibold text-gray-800 mt-1">
+              <h3 className="mt-1 font-semibold text-gray-800">
                 {selectedQuery.orderId || "N/A"}
               </h3>
             </div>
 
+            {/* SUBJECT */}
+
             <div>
               <p className="text-sm text-gray-500">Subject</p>
 
-              <h3 className="font-semibold text-gray-800 mt-1">
+              <h3 className="mt-1 font-semibold text-gray-800">
                 {selectedQuery.subject}
               </h3>
             </div>
 
-            {/* Status Select */}
+            {/* STATUS */}
+
             <div>
-              <p className="text-sm text-gray-500 mb-2">Status</p>
+              <p className="mb-2 text-sm text-gray-500">Status</p>
 
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="
-                  w-full
-                  border
-                  border-gray-300
-                  rounded-xl
-                  px-4
-                  py-2.5
-                  focus:outline-none
-                  focus:ring-2
-                  focus:ring-orange-400
-                  bg-white
-                "
+                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
               >
                 {statuses.map((status) => (
                   <option key={status} value={status}>
-                    {status}
+                    {status.replace(/_/g, " ")}
                   </option>
                 ))}
               </select>
             </div>
           </div>
 
-          {/* Message */}
-          <div>
-            <p className="text-sm text-gray-500 mb-2">Customer Message</p>
+          {/* CUSTOMER MESSAGE */}
 
-            <div
-              className="
-              bg-gray-50
-              border
-              border-gray-200
-              rounded-xl
-              p-4
-            "
-            >
-              <p className="text-gray-700 leading-relaxed">
+          <div>
+            <p className="mb-2 text-sm text-gray-500">Customer Message</p>
+
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <p className="leading-relaxed text-gray-700">
                 {selectedQuery.message}
               </p>
             </div>
           </div>
 
-          {/* Footer */}
+          {/* FOOTER */}
+
           <div className="flex items-center justify-end gap-3 pt-2">
             <button
               onClick={() => setSelectedQuery(null)}
-              className="
-              border
-              border-gray-300
-              px-5
-              py-2.5
-              rounded-xl
-              hover:bg-gray-100
-              transition
-            "
+              className="rounded-xl border border-gray-300 px-5 py-2.5 transition hover:bg-gray-100"
             >
               Close
             </button>
 
             <button
-              className="
-              bg-orange-500
-              hover:bg-orange-600
-              text-white
-              px-5
-              py-2.5
-              rounded-xl
-              transition
-            "
-              onClick={() => {
-                handleTicketStatusUpdate(selectedQuery.id, selectedStatus);
-              }}
+              onClick={handleTicketStatusUpdate}
+              disabled={selectedStatus === selectedQuery.status}
+              className="rounded-xl bg-orange-500 px-5 py-2.5 text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Update Status
             </button>
