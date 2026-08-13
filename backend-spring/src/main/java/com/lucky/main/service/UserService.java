@@ -6,13 +6,15 @@ import com.lucky.main.dto.UserResponse;
 import com.lucky.main.entity.Role;
 import com.lucky.main.entity.User;
 import com.lucky.main.exception.UserNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    List<UserResponse> getAllUsers();
+    Page<UserResponse> getAllUsers(Pageable pageable);
 
     Optional<User> addUser(User user) throws IOException;
 

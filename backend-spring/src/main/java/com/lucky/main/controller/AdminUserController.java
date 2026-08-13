@@ -5,6 +5,9 @@ import com.lucky.main.entity.Role;
 import com.lucky.main.exception.UserNotFoundException;
 import com.lucky.main.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +22,10 @@ public class AdminUserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers()
-    {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<Page<UserResponse>> getAllUsers(
+            @PageableDefault(size = 10,sort = "id") Pageable pageable
+    ) {
+        return ResponseEntity.ok(userService.getAllUsers(pageable));
     }
 
     @PatchMapping("/block/{id}")
@@ -30,8 +34,7 @@ public class AdminUserController {
     }
 
     @GetMapping("/{keyword}")
-    public ResponseEntity<List<UserResponse>> filterUsers(@PathVariable String keyword)
-    {
+    public ResponseEntity<List<UserResponse>> filterUsers(@PathVariable String keyword) {
         return ResponseEntity.ok(userService.filterUsers(keyword));
     }
 
@@ -39,9 +42,9 @@ public class AdminUserController {
     public ResponseEntity<UserResponse> unBlockUser(@PathVariable Long id) throws UserNotFoundException {
         return ResponseEntity.ok(userService.unBlockUser(id));
     }
+
     @GetMapping("/count")
-    public ResponseEntity<Long> countUser()
-    {
+    public ResponseEntity<Long> countUser() {
         return ResponseEntity.ok(userService.countPeopleWhichRoleUser(Role.USER));
     }
 

@@ -108,21 +108,21 @@ export default function AdminQueryManagementPage() {
     setSelectedQuery(data);
   };
 
-  const handlePrevious = () => {
-    if (currentPage > 0) {
-      setCurrentPage((prev) => {
-        return prev - 1;
-      });
-    }
-  };
+  // const handlePrevious = () => {
+  //   if (currentPage > 0) {
+  //     setCurrentPage((prev) => {
+  //       return prev - 1;
+  //     });
+  //   }
+  // };
 
-  const handleNext = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage((prev) => {
-        return prev + 1;
-      });
-    }
-  };
+  // const handleNext = () => {
+  //   if (currentPage < totalPages - 1) {
+  //     setCurrentPage((prev) => {
+  //       return prev + 1;
+  //     });
+  //   }
+  // };
 
   return (
     <div className="space-y-6">
