@@ -1,7 +1,7 @@
 import api from "../axiosInstance";
 
-export const getAllUsers = async () => {
-  return await api.get("/admin/api/user");
+export const getAllUsers = async (currentPage,pageSize) => {
+  return await api.get(`/admin/api/user?page=${currentPage}&size=${pageSize}`);
 };
 
 export const blockUser = async (id) => {
