@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { deleteFood } from "../api/service/foodService";
 import { Eye, Pencil, Trash2, X } from "lucide-react";
 
-const Food = ({ food, handleEdit, updateDeleteLocal, setActionLoading }) => {
+const Food = ({ food, handleEdit, setActionLoading,fetchFoods }) => {
   const {
     id,
     imageUrl,
@@ -24,7 +24,7 @@ const Food = ({ food, handleEdit, updateDeleteLocal, setActionLoading }) => {
       const response = await deleteFood(id);
       if (response.status === 204 || response.status === 200) {
         toast.success("Food deleted successfully");
-        updateDeleteLocal(id);
+        fetchFoods();
       }
     } catch (error) {
       toast.error(

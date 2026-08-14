@@ -88,7 +88,7 @@ const AdminUserManagementPage = () => {
   };
 
   const handleNextPageRequest = () => {
-    if (currentPage < totalPages) {
+    if (currentPage < totalPages-1) {
       setCurrentPage((prev) => prev + 1);
     }
   };

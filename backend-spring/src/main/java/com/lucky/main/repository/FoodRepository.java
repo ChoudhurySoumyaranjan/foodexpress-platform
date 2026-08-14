@@ -1,6 +1,8 @@
 package com.lucky.main.repository;
 
 import com.lucky.main.entity.Food;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,7 +24,7 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
             """)
     List<Food> searchFoods(@Param("keyword") String keyword);
 
-    List<Food> findByActiveTrue();
+    Page<Food> findByActiveTrue(Pageable pageable);
 
     List<Food> findByActiveFalse();
 }
