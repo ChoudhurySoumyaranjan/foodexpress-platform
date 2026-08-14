@@ -125,7 +125,7 @@ export default function AdminCategoryPage() {
   }
 
   const handleNextPageRequest=()=>{
-    if(currentPage<totalPages){
+    if(currentPage<totalPages-1){
       setCurrentPage((prev)=>prev+1);
     }
   }

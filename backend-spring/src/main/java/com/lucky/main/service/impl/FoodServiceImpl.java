@@ -13,6 +13,8 @@ import com.lucky.main.repository.CategoryRepository;
 import com.lucky.main.repository.FoodRepository;
 import com.lucky.main.service.FoodService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -61,12 +63,11 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public List<FoodResponse> getAllFoods() {
+    public Page<FoodResponse> getAllFoods(Pageable pageable) {
 
         try {
-            return foodRepository.findByActiveTrue()
-                    .stream()
-                    .map(food -> FoodMapper.toResponse(food)).collect(Collectors.toList());
+            return foodRepository.findByActiveTrue(pageable)
+                    .map(food -> FoodMapper.toResponse(food));
         } catch (Exception e) {
             throw new FoodNotFoundException(e.getMessage());
         }
@@ -94,7 +95,7 @@ public class FoodServiceImpl implements FoodService {
 
         //foodRepository.delete(food);
         food.setActive(false);
-        Food updated =foodRepository.save(food);
+        Food updated = foodRepository.save(food);
         return FoodMapper.toResponse(updated);
     }
 
