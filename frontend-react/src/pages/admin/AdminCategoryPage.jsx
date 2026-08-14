@@ -3,12 +3,13 @@ import { toast } from "react-toastify";
 import {
   addCategory,
   editCategory,
-  getCategories,
+  getPaginatedCategories
 } from "../../api/service/categoryService";
 
 import Category from "../../components/Category";
 import Loader from "../../components/Loader";
 import { ImagePlus, X } from "lucide-react";
+import { CrueltyFree } from "@mui/icons-material";
 
 export default function AdminCategoryPage() {
   const [categoryName, setCategoryName] = useState({ name: "" });
@@ -22,6 +23,10 @@ export default function AdminCategoryPage() {
   const [editPreview, setEditPreview] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalPages, setTotalPages] = useState(0);
+
   const handleEdit = (cat) => {
     setShowModal(true);
     setSelectedCategory(cat);
@@ -31,9 +36,11 @@ export default function AdminCategoryPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await getCategories();
+      const response = await getPaginatedCategories(currentPage,pageSize);
       if (response.status === 200) {
-        setCategories(response.data);
+        setCategories(response.data.content || null);
+        setPageSize(response.data.size);
+        setTotalPages(response.data.totalPages);
       }
     } catch (error) {
       toast.error(error?.response?.data || "Failed to fetch categories");
@@ -44,7 +51,7 @@ export default function AdminCategoryPage() {
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [currentPage,pageSize]);
 
   const updateDeleteLocal = (id) => {
     setCategories((prev) => prev.filter((cat) => cat.id !== id));
@@ -110,6 +117,18 @@ export default function AdminCategoryPage() {
       setActionLoading(false);
     }
   };
+
+  const handlePreviousPageRequest = ()=>{
+    if(currentPage>0){
+      setCurrentPage((prev)=>{return prev-1});
+    }
+  }
+
+  const handleNextPageRequest=()=>{
+    if(currentPage<totalPages){
+      setCurrentPage((prev)=>prev+1);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -263,6 +282,63 @@ export default function AdminCategoryPage() {
                   setActionLoading={setActionLoading}
                 />
               ))}
+            </div>
+          )}
+
+          {!loading && totalPages > 0 && (
+            <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
+              {/* Page information */}
+              <p className="text-sm text-gray-500">
+                Page{" "}
+                <span className="font-semibold text-gray-700">
+                  {currentPage + 1}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-gray-700">
+                  {totalPages}
+                </span>
+              </p>
+
+              {/* Pagination */}
+              <div className="flex items-center gap-2">
+                {/* Previous */}
+                <button
+                  onClick={handlePreviousPageRequest}
+                  disabled={currentPage === 0}
+                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium
+                   text-gray-700 hover:bg-gray-50
+                   disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Previous
+                </button>
+
+                {/* Page Numbers */}
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index}
+                    onClick={()=>{setCurrentPage(index)}}
+                    className={`rounded-lg px-4 py-2 text-sm font-medium
+            ${
+              currentPage === index
+                ? "bg-[#FC8019] text-white"
+                : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+            }`}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+
+                {/* Next */}
+                <button
+                  onClick={handleNextPageRequest}
+                  disabled={currentPage === totalPages - 1}
+                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium
+                   text-gray-700 hover:bg-gray-50
+                   disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>

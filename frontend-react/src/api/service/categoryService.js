@@ -1,21 +1,25 @@
-import api from "../axiosInstance"
+import api from "../axiosInstance";
 
-export const addCategory= async (formData)=>{
-    return await api.post("/admin/api/categories",formData)
-}
+export const addCategory = async (formData) => {
+  return await api.post("/admin/api/categories", formData);
+};
 
-export const getCategories=async ()=>{
-    return await api.get("/admin/api/categories")
-}
+export const getCategories = async () => {
+  return await api.get(`/admin/api/categories/all`);
+};
 
-export const deleteCategory=async(id)=>{
-    return await api.delete(`/admin/api/categories/${id}`);
-}
+export const getPaginatedCategories = async (page, size) => {
+  return await api.get(`/admin/api/categories?page=${page}&size=${size}`);
+};
 
-export const editCategory=async(id, formData)=>{
-    return await api.put(`/admin/api/categories/${id}`,formData);
-}
+export const deleteCategory = async (id) => {
+  return await api.delete(`/admin/api/categories/${id}`);
+};
 
-export const getCatgeoryById = async(id)=>{
-    return await api.get(`/admin/api/categories/${id}`)
-}
+export const editCategory = async (id, formData) => {
+  return await api.put(`/admin/api/categories/${id}`, formData);
+};
+
+export const getCatgeoryById = async (id) => {
+  return await api.get(`/admin/api/categories/${id}`);
+};

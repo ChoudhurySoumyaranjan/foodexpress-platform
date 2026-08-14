@@ -11,12 +11,15 @@ import com.lucky.main.mapper.CategoryMapper;
 import com.lucky.main.repository.CategoryRepository;
 import com.lucky.main.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,12 +61,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryResponse> getAll() {
+    public Page<CategoryResponse> getAll(Pageable pageable) {
+        return categoryRepository.findAll(pageable)
+                .map((category)->CategoryMapper.toResponse(category));
+    }
+
+    @Override
+    public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll()
                 .stream()
-                .map((cat)->CategoryMapper.toResponse(cat))
-                .toList();
+                .map((category -> CategoryMapper.toResponse(category)))
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public CategoryResponse getById(Long id) {

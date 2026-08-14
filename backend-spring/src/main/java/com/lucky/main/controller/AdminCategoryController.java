@@ -6,6 +6,9 @@ import com.lucky.main.dto.CategoryRequest;
 import com.lucky.main.dto.CategoryResponse;
 import com.lucky.main.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,10 +34,14 @@ public class AdminCategoryController {
         return ResponseEntity.ok(categoryService.create(categoryRequest,multipartFile));
     }
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAll() {
-        return ResponseEntity.ok(categoryService.getAll());
+    public ResponseEntity<Page<CategoryResponse>> getAll(@PageableDefault(size = 5,sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(categoryService.getAll(pageable));
     }
 
+    @GetMapping("/all")
+    public List<CategoryResponse> getAllCategories() {
+        return categoryService.getAllCategories();
+    }
     @GetMapping("/{id}")
     //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponse> getById(@PathVariable Long id) {
