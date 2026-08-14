@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import {
   addCategory,
   editCategory,
-  getPaginatedCategories
+  getPaginatedCategories,
 } from "../../api/service/categoryService";
 
 import Category from "../../components/Category";
@@ -36,12 +36,19 @@ export default function AdminCategoryPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await getPaginatedCategories(currentPage,pageSize);
-      if (response.status === 200) {
-        setCategories(response.data.content || null);
-        setPageSize(response.data.size);
-        setTotalPages(response.data.totalPages);
+      const response = await getPaginatedCategories(currentPage, pageSize);
+
+      const data = response.data;
+
+      setTotalPages(data.totalPages);
+
+      // If current page no longer exists
+      if (data.totalPages > 0 && currentPage >= data.totalPages) {
+        setCurrentPage(data.totalPages - 1);
+        return;
       }
+
+      setCategories(data.content);
     } catch (error) {
       toast.error(error?.response?.data || "Failed to fetch categories");
     } finally {
@@ -51,7 +58,7 @@ export default function AdminCategoryPage() {
 
   useEffect(() => {
     fetchCategories();
-  }, [currentPage,pageSize]);
+  }, [currentPage, pageSize]);
 
   const updateDeleteLocal = (id) => {
     setCategories((prev) => prev.filter((cat) => cat.id !== id));
@@ -118,17 +125,19 @@ export default function AdminCategoryPage() {
     }
   };
 
-  const handlePreviousPageRequest = ()=>{
-    if(currentPage>0){
-      setCurrentPage((prev)=>{return prev-1});
+  const handlePreviousPageRequest = () => {
+    if (currentPage > 0) {
+      setCurrentPage((prev) => {
+        return prev - 1;
+      });
     }
-  }
+  };
 
-  const handleNextPageRequest=()=>{
-    if(currentPage<totalPages-1){
-      setCurrentPage((prev)=>prev+1);
+  const handleNextPageRequest = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage((prev) => prev + 1);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -316,7 +325,9 @@ export default function AdminCategoryPage() {
                 {Array.from({ length: totalPages }, (_, index) => (
                   <button
                     key={index}
-                    onClick={()=>{setCurrentPage(index)}}
+                    onClick={() => {
+                      setCurrentPage(index);
+                    }}
                     className={`rounded-lg px-4 py-2 text-sm font-medium
             ${
               currentPage === index

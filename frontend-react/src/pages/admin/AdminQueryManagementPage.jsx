@@ -19,13 +19,8 @@ export default function AdminQueryManagementPage() {
   const [loading, setLoading] = useState(true);
 
   const [searchKeyword, setSearchKeyword] = useState("");
-
-  // Spring Boot pagination is 0-based
   const [currentPage, setCurrentPage] = useState(0);
-
-  const [pageSize, setPageSize] = useState(0);
-
-  // Total number of pages returned by backend
+  const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
 
   const fetchQueries = async () => {
@@ -34,13 +29,9 @@ export default function AdminQueryManagementPage() {
 
       let response;
 
-      // No search keyword
       if (searchKeyword.trim() === "") {
         response = await getAllContactUsMessage(currentPage, pageSize);
-      }
-
-      // Search keyword exists
-      else {
+      } else {
         response = await getFilteredContactUsMessage(
           searchKeyword.trim(),
           currentPage,
@@ -48,17 +39,12 @@ export default function AdminQueryManagementPage() {
         );
       }
 
-      const pageData = response.data;
+      const data = response.data;
 
-      // Page.content contains the actual tickets
-      setQueries(pageData.content || []);
-
-      // Total number of pages
-      setTotalPages(pageData.totalPages || 0);
-      setPageSize(pageData.size);
+      setQueries(data.content || []);
+      setTotalPages(data.totalPages);
+      setPageSize(data.size);
     } catch (error) {
-      console.log(error.response?.data);
-
       toast.error("Failed to fetch tickets");
     } finally {
       setLoading(false);
@@ -72,6 +58,8 @@ export default function AdminQueryManagementPage() {
 
     return () => clearTimeout(timer);
   }, [currentPage, searchKeyword]);
+
+  
 
   const handleSearchChange = (e) => {
     const value = e.target.value;

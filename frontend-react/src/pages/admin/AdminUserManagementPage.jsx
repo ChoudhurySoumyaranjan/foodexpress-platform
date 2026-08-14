@@ -26,7 +26,7 @@ const AdminUserManagementPage = () => {
     setLoading(true);
     try {
       const response = await getAllUsers(currentPage, pageSize);
-      setUsers(response.data.content || null);
+      setUsers(response.data.content || []);
       setTotalPages(response.data.totalPages);
       setPageSize(response.data.size);
     } catch (error) {
