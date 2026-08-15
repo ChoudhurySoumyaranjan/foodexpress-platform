@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { getCategories } from "../../api/service/categoryService";
 import {
   addFood,
-  fetchAllFoods,
+  fetchPaginatedFoods,
   updateFood,
 } from "../../api/service/foodService";
 import Food from "../../components/Food";
@@ -37,7 +37,7 @@ export default function AdminFoodPage() {
 
   const fetchFoods = async () => {
     try {
-      const res = await fetchAllFoods(currentPage, pageSize);
+      const res = await fetchPaginatedFoods(currentPage, pageSize);
 
       const newTotalPages = res.data.totalPages;
 

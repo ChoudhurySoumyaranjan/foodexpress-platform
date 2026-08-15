@@ -1,8 +1,9 @@
 package com.lucky.main.repository;
 
 import com.lucky.main.dto.RecentUserDTO;
-import com.lucky.main.entity.Role;
+import com.lucky.main.enums.Role;
 import com.lucky.main.entity.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -44,4 +45,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             ORDER BY u.createdAt DESC
             """)
     List<RecentUserDTO> findRecentUsers(Pageable pageable);
+
+    Page<User> findByRolesContaining(Role role, Pageable pageable);
 }

@@ -1,7 +1,7 @@
 package com.lucky.main.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.lucky.main.entity.Role;
+import com.lucky.main.enums.Role;
 import lombok.Builder;
 import lombok.Data;
 

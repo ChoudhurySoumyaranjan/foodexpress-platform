@@ -7,6 +7,9 @@ import com.lucky.main.dto.FoodResponse;
 import com.lucky.main.exception.food.FoodException;
 import com.lucky.main.service.FoodService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -78,5 +81,17 @@ public class AdminFoodController {
     @GetMapping("/count")
     public ResponseEntity<Long> getFoodsCount() {
         return ResponseEntity.ok(foodService.getTotalFoodsCount());
+    }
+
+
+    @GetMapping
+    public ResponseEntity<Page<FoodResponse>> getPaginatedFood(@PageableDefault(size = 7, sort = "id") Pageable pageable) {
+        Page<FoodResponse> foodResponses = foodService.getPaginatedFoods(pageable);
+
+        if (foodResponses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(foodResponses);
     }
 }

@@ -1,7 +1,11 @@
 import api from "../axiosInstance";
 
-export const fetchAllFoods = async (pageNo, pageSize) => {
-  return await api.get(`/api/foods?page=${pageNo}&size=${pageSize}`);
+export const fetchPaginatedFoods = async (pageNo, pageSize) => {
+  return await api.get(`/admin/api/foods?page=${pageNo}&size=${pageSize}`);
+};
+
+export const fetchAllFoods = async () => {
+  return await api.get(`/api/foods/all`);
 };
 
 export const fetchFoodById = async (id) => {

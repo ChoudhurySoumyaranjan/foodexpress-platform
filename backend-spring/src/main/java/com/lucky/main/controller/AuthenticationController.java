@@ -1,13 +1,12 @@
 package com.lucky.main.controller;
 
 import com.lucky.main.dto.*;
-import com.lucky.main.entity.Role;
+import com.lucky.main.enums.Role;
 import com.lucky.main.entity.User;
 import com.lucky.main.exception.UserNotFoundException;
 import com.lucky.main.service.AuthenticationService;
 import com.lucky.main.service.JwtService;
 import com.lucky.main.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,6 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
@@ -44,31 +42,7 @@ public class AuthenticationController {
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request)
             throws UserNotFoundException, IOException {
 
-        User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .phoneNumber(request.getPhoneNumber())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .address(request.getAddress())
-                .enabled(true)
-                .roles(Set.of(Role.USER))
-                .build();
-
-        User savedUser = userService.addUser(user)
-                .orElseThrow(() -> new UserNotFoundException("Unable to save user"));
-
-        UserResponse response = UserResponse.builder()
-                .id(savedUser.getId())
-                .name(savedUser.getFirstName() + " " + savedUser.getLastName())
-                .email(savedUser.getEmail())
-                .phoneNumber(savedUser.getPhoneNumber())
-                .createAt(savedUser.getCreatedAt())
-                .updateAt(savedUser.getUpdatedAt())
-                .isEnabled(savedUser.isEnabled())
-                .address(savedUser.getAddress())
-                .roles(savedUser.getRoles())
-                .build();
+        UserResponse response = userService.addUser(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

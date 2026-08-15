@@ -8,8 +8,8 @@ export const getOrdersOfUser = async () => {
   return await api.get(`/api/orders`);
 };
 
-export const getAllOrders = async () => {
-  return await api.get(`/admin/api/orders/all`);
+export const getAllOrders = async (pageNo, pageSize) => {
+  return await api.get(`/admin/api/orders/all?page=${pageNo}&size=${pageSize}`);
 };
 
 export const getOrderById = async (orderId) => {
@@ -32,8 +32,10 @@ export const updateOrderStatus = async (orderId, status) => {
   return await api.patch(`/admin/api/orders/${orderId}?status=${status}`);
 };
 
-export const getFilteredOrders = async (keyword) => {
-  return await api.get(`/admin/api/orders?keyword=${keyword}`);
+export const getFilteredOrders = async (pageNo, pageSize, keyword) => {
+  return await api.get(
+    `/admin/api/orders?page=${pageNo}&size=${pageSize}&keyword=${keyword}`,
+  );
 };
 
 export const getTotalOrderdAmount = async () => {

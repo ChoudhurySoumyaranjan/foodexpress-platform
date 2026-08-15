@@ -63,7 +63,7 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public Page<FoodResponse> getAllFoods(Pageable pageable) {
+    public Page<FoodResponse> getPaginatedFoods(Pageable pageable) {
 
         try {
             return foodRepository.findByActiveTrue(pageable)
@@ -71,6 +71,14 @@ public class FoodServiceImpl implements FoodService {
         } catch (Exception e) {
             throw new FoodNotFoundException(e.getMessage());
         }
+    }
+
+    @Override
+    public List<FoodResponse> getAllFoods() {
+        return foodRepository.findByActiveTrue()
+                .stream()
+                .map(food -> FoodMapper.toResponse(food))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -85,13 +93,13 @@ public class FoodServiceImpl implements FoodService {
                 .orElseThrow(() -> new FoodNotFoundException(id));
 
         // delete image from cloudinary (if exists)
-        if (food.getPublicId() != null) {
-            try {
-                cloudinaryService.deleteImage(food.getPublicId());
-            } catch (Exception e) {
-                System.out.println("Failed to delete image: " + e.getMessage());
-            }
-        }
+//        if (food.getPublicId() != null) {
+//            try {
+//                cloudinaryService.deleteImage(food.getPublicId());
+//            } catch (Exception e) {
+//                System.out.println("Failed to delete image: " + e.getMessage());
+//            }
+//        }
 
         //foodRepository.delete(food);
         food.setActive(false);

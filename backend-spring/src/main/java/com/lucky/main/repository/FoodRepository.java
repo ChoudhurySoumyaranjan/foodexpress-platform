@@ -26,5 +26,7 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
 
     Page<Food> findByActiveTrue(Pageable pageable);
 
+    List<Food> findByActiveTrue();
+
     List<Food> findByActiveFalse();
 }

@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
 import AdminOrderCard from "../../components/AdminOrderCard";
-import { getAllOrders, getFilteredOrders } from "../../api/service/orderService";
+import {
+  getAllOrders,
+  getFilteredOrders,
+} from "../../api/service/orderService";
 import { Search } from "@mui/icons-material";
 
 const AdminOrdersPage = () => {
@@ -10,32 +13,38 @@ const AdminOrdersPage = () => {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
-  const searchOrders = async (keyword) => {
-    try {
-      setLoading(true);
-
-      if (keyword.trim() === "") {
-        const response = await getAllOrders();
-        setOrders(response.data || []);
-      } else {
-        const response = await getFilteredOrders(keyword);
-        setOrders(response.data || []);
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load orders");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [pageSize, setPageSize] = useState(4);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
+      setError("");
 
-      const response = await getAllOrders();
+      let response;
 
-      setOrders(response?.data || []);
+      if (search.trim() === "") {
+        response = await getAllOrders(currentPage, pageSize);
+      } else {
+        response = await getFilteredOrders(
+          currentPage,
+          pageSize,
+          search.trim(),
+        );
+      }
+
+      const newTotalPages = response.data.totalPages;
+
+      // If current page no longer exists
+      if (newTotalPages > 0 && currentPage >= newTotalPages) {
+        setTotalPages(newTotalPages);
+        setCurrentPage(newTotalPages - 1);
+        return;
+      }
+
+      setOrders(response.data.content || []);
+      setTotalPages(newTotalPages);
     } catch (err) {
       console.error(err);
       setError("Failed to load orders");
@@ -45,16 +54,24 @@ const AdminOrdersPage = () => {
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  useEffect(() => {
     const timer = setTimeout(() => {
-      searchOrders(search);
+      fetchOrders();
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, currentPage]);
+
+  const handleNextPageRequest = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage((previous) => previous + 1);
+    }
+  };
+
+  const handlePreviousPageRequest = () => {
+    if (currentPage > 0) {
+      setCurrentPage((previous) => previous - 1);
+    }
+  };
 
   if (loading) {
     return (
@@ -140,6 +157,62 @@ const AdminOrdersPage = () => {
             />
           ))}
         </div>
+        {/* PAGINATION */}
+
+        {!loading && totalPages > 0 && (
+          <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
+            {/* Page information */}
+            <p className="text-sm text-gray-500">
+              Page{" "}
+              <span className="font-semibold text-gray-700">
+                {currentPage + 1}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-gray-700">{totalPages}</span>
+            </p>
+
+            {/* Pagination */}
+            <div className="flex items-center gap-2">
+              {/* Previous */}
+              <button
+                onClick={handlePreviousPageRequest}
+                disabled={currentPage === 0}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium
+                   text-gray-700 hover:bg-gray-50
+                   disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Previous
+              </button>
+
+              {/* Page Numbers */}
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentPage(index)}
+                  className={`rounded-lg px-4 py-2 text-sm font-medium
+            ${
+              currentPage === index
+                ? "bg-[#FC8019] text-white"
+                : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+            }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              {/* Next */}
+              <button
+                onClick={handleNextPageRequest}
+                disabled={currentPage === totalPages - 1}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium
+                   text-gray-700 hover:bg-gray-50
+                   disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

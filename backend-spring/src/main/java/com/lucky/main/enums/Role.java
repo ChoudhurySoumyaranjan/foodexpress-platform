@@ -1,4 +1,4 @@
-package com.lucky.main.entity;
+package com.lucky.main.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

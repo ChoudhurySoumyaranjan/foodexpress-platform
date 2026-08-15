@@ -1,7 +1,7 @@
 package com.lucky.main.controller;
 
 import com.lucky.main.dto.UserResponse;
-import com.lucky.main.entity.Role;
+import com.lucky.main.enums.Role;
 import com.lucky.main.exception.UserNotFoundException;
 import com.lucky.main.service.UserService;
 import lombok.RequiredArgsConstructor;
