@@ -30,9 +30,9 @@ public class FoodController {
         return ResponseEntity.ok(foods);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<FoodResponse>> getAllFood(@PageableDefault(size = 7, sort = "id") Pageable pageable) {
-        Page<FoodResponse> foodResponses = foodService.getAllFoods(pageable);
+    @GetMapping("/all")
+    public ResponseEntity<List<FoodResponse>> getAllFood() {
+        List<FoodResponse> foodResponses = foodService.getAllFoods();
 
         if (foodResponses.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -40,6 +40,8 @@ public class FoodController {
 
         return ResponseEntity.ok(foodResponses);
     }
+
+
 
     @GetMapping("/search")
     public ResponseEntity<List<FoodResponse>> getFoodsBySearch(@RequestParam String keyword) {

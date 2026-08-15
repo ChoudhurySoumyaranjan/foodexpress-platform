@@ -2,17 +2,15 @@ package com.lucky.main.service.impl;
 
 import com.lucky.main.dto.UpdateUserDetailsRequest;
 import com.lucky.main.dto.UserResponse;
-import com.lucky.main.entity.Role;
+import com.lucky.main.enums.Role;
 import com.lucky.main.entity.User;
 import com.lucky.main.exception.UserNotFoundException;
 import com.lucky.main.mapper.UserMapper;
 import com.lucky.main.repository.UserRepository;
 import com.lucky.main.service.UserService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -29,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponse> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable)
+        return userRepository.findByRolesContaining(Role.USER,pageable)
                 .map(UserMapper::toResponse);
     }
 

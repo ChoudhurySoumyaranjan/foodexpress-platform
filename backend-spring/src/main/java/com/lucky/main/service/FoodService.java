@@ -10,7 +10,8 @@ import java.util.List;
 
 public interface FoodService {
     FoodResponse addFood(FoodRequest foodRequest, MultipartFile file);
-    Page<FoodResponse> getAllFoods(Pageable pageable);
+    Page<FoodResponse> getPaginatedFoods(Pageable pageable);
+    List<FoodResponse> getAllFoods();
     FoodResponse updateFood(Long id,FoodRequest foodRequest, MultipartFile file);
     FoodResponse getFoodById(long id);
     FoodResponse deleteFoodById(long id);

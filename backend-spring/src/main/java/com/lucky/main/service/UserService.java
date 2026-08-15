@@ -3,7 +3,7 @@ package com.lucky.main.service;
 import com.lucky.main.dto.ChangePasswordRequest;
 import com.lucky.main.dto.UpdateUserDetailsRequest;
 import com.lucky.main.dto.UserResponse;
-import com.lucky.main.entity.Role;
+import com.lucky.main.enums.Role;
 import com.lucky.main.entity.User;
 import com.lucky.main.exception.UserNotFoundException;
 import org.springframework.data.domain.Page;

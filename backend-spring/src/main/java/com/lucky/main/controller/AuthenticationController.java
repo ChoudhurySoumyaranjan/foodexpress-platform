@@ -1,13 +1,12 @@
 package com.lucky.main.controller;
 
 import com.lucky.main.dto.*;
-import com.lucky.main.entity.Role;
+import com.lucky.main.enums.Role;
 import com.lucky.main.entity.User;
 import com.lucky.main.exception.UserNotFoundException;
 import com.lucky.main.service.AuthenticationService;
 import com.lucky.main.service.JwtService;
 import com.lucky.main.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
