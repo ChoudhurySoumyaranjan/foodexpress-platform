@@ -1,9 +1,11 @@
 package com.lucky.main.service.impl;
 
+import com.lucky.main.dto.ChangePasswordRequest;
+import com.lucky.main.dto.RegisterRequest;
 import com.lucky.main.dto.UpdateUserDetailsRequest;
 import com.lucky.main.dto.UserResponse;
-import com.lucky.main.enums.Role;
 import com.lucky.main.entity.User;
+import com.lucky.main.enums.Role;
 import com.lucky.main.exception.UserNotFoundException;
 import com.lucky.main.mapper.UserMapper;
 import com.lucky.main.repository.UserRepository;
@@ -14,10 +16,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import com.lucky.main.dto.ChangePasswordRequest;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -27,18 +30,43 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponse> getAllUsers(Pageable pageable) {
-        return userRepository.findByRolesContaining(Role.USER,pageable)
+        return userRepository.findByRolesContaining(Role.USER, pageable)
                 .map(UserMapper::toResponse);
     }
 
     @Override
-    public Optional<User> addUser(User user) {
+    public UserResponse addUser(RegisterRequest request) throws UserNotFoundException {
+
+        User user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .address(request.getAddress())
+                .enabled(true)
+                .roles(Set.of(Role.USER))
+                .build();
 
         User savedUser = userRepository.save(user);
+
+
         if (ObjectUtils.isEmpty(savedUser)) {
-            return Optional.empty();
+            throw new UserNotFoundException("Failed to Create New User");
+        } else {
+            return UserResponse.builder()
+                    .id(savedUser.getId())
+                    .name(savedUser.getFirstName() + " " + savedUser.getLastName())
+                    .email(savedUser.getEmail())
+                    .phoneNumber(savedUser.getPhoneNumber())
+                    .createAt(savedUser.getCreatedAt())
+                    .updateAt(savedUser.getUpdatedAt())
+                    .isEnabled(savedUser.isEnabled())
+                    .address(savedUser.getAddress())
+                    .roles(savedUser.getRoles())
+                    .build();
         }
-        return Optional.of(savedUser);
+
     }
 
     @Override

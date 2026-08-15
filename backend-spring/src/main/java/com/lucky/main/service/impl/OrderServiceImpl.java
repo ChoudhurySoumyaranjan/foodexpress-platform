@@ -16,6 +16,8 @@ import com.lucky.main.service.EmailService;
 import com.lucky.main.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -136,11 +138,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public List<OrderResponse> getAllOrders() {
-        return orderRepository.findAll()
-                .stream()
-                .map((order) -> OrderMapper.toResponse(order))
-                .collect(Collectors.toList());
+    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+        return orderRepository.findAll(pageable)
+                .map((order) -> OrderMapper.toResponse(order));
     }
 
     @Override
@@ -187,18 +187,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public List<OrderResponse> filterOrders(String keyword) {
+    public Page<OrderResponse> filterOrders(String keyword,Pageable pageable) {
 
         if (keyword == null || keyword.isBlank()) {
-            return orderRepository.findAll()
-                    .stream()
-                    .map((order) -> OrderMapper.toResponse(order))
-                    .toList();
+            return orderRepository.findAll(pageable)
+                    .map((order) -> OrderMapper.toResponse(order));
         }
-        return orderRepository.searchOrders(keyword.trim())
-                .stream()
-                .map((order) -> OrderMapper.toResponse(order))
-                .toList();
+        return orderRepository.searchOrders(keyword.trim(),pageable)
+                .map((order) -> OrderMapper.toResponse(order));
     }
 
     @Override

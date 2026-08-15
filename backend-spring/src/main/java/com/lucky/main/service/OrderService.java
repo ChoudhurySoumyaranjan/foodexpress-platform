@@ -3,6 +3,8 @@ package com.lucky.main.service;
 import com.lucky.main.dto.OrderResponse;
 import com.lucky.main.dto.PlaceOrderRequest;
 import com.lucky.main.enums.OrderStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -12,11 +14,11 @@ public interface OrderService {
 
     Long placeOrder(PlaceOrderRequest request);
 
-    List<OrderResponse> getAllOrders();
+    Page<OrderResponse> getAllOrders(Pageable pageable);
 
     OrderResponse updateOrderStatus(Long orderId, OrderStatus orderStatus);
 
-    List<OrderResponse> filterOrders(String keyword);
+    Page<OrderResponse> filterOrders(String keyword,Pageable pageable);
 
     Double getTotalOrderAmount();
     Long getTotalOrders();

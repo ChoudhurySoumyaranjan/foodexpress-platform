@@ -27,6 +27,6 @@ public class Category {
     @Column(name = "public_id")
     private String publicId;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Food> foods;  //non owning (parent side)
 }
