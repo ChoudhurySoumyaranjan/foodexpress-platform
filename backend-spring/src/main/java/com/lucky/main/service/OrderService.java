@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    List<OrderResponse> getOrdersByUser(Long userId);
+    Page<OrderResponse> getOrdersByUser(Long userId,Pageable pageable);
 
     Long placeOrder(PlaceOrderRequest request);
 

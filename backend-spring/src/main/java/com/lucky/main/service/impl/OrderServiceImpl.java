@@ -7,7 +7,6 @@ import com.lucky.main.enums.OrderStatus;
 import com.lucky.main.enums.PaymentStatus;
 import com.lucky.main.enums.PaymentType;
 import com.lucky.main.mapper.OrderMapper;
-import com.lucky.main.mapper.UserMapper;
 import com.lucky.main.repository.CartRepository;
 import com.lucky.main.repository.FoodRepository;
 import com.lucky.main.repository.OrderRepository;
@@ -19,10 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,17 +31,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public List<OrderResponse> getOrdersByUser(Long userId) {
+    public Page<OrderResponse> getOrdersByUser(Long userId, Pageable pageable) {
 
         userRepository.findById(userId)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
         return orderRepository
-                .findByUser_IdOrderByOrderDateDesc(userId)
-                .stream()
-                .map(OrderMapper::toResponse)
-                .toList();
+                .findByUser_IdOrderByOrderDateDesc(userId, pageable)
+                .map(OrderMapper::toResponse);
     }
 
     @Override
@@ -187,13 +180,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Page<OrderResponse> filterOrders(String keyword,Pageable pageable) {
+    public Page<OrderResponse> filterOrders(String keyword, Pageable pageable) {
 
         if (keyword == null || keyword.isBlank()) {
             return orderRepository.findAll(pageable)
                     .map((order) -> OrderMapper.toResponse(order));
         }
-        return orderRepository.searchOrders(keyword.trim(),pageable)
+        return orderRepository.searchOrders(keyword.trim(), pageable)
                 .map((order) -> OrderMapper.toResponse(order));
     }
 
