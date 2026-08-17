@@ -4,8 +4,8 @@ export const placeOrderApi = async (data) => {
   return await api.post("/api/orders/place", data);
 };
 
-export const getOrdersOfUser = async () => {
-  return await api.get(`/api/orders`);
+export const getOrdersOfUser = async (page, size) => {
+  return await api.get(`/api/orders?page=${page}&size=${size}`);
 };
 
 export const getAllOrders = async (pageNo, pageSize) => {
