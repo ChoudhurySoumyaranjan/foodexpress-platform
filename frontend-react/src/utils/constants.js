@@ -1,4 +1,4 @@
-export const BACKEND_BASE_URL ="http://localhost:5001";
+export const BACKEND_BASE_URL =import.meta.env.VITE_BACKEND_URL || "http://localhost:5001";
 
 export const DEV_MODE = false
 export const DELIVERY_FEE=50;

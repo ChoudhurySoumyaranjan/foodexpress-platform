@@ -106,6 +106,7 @@ const AdminOrderCard = ({ order, refreshOrders }) => {
       setSelectedStatus("");
       await refreshOrders();
       toast.success("Order status updated");
+      
     } catch (error) {
       toast.error(
         error?.response?.data?.message || "Failed to update order status",
