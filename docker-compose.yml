@@ -1,0 +1,52 @@
+services:
+
+  backend:
+    build:
+      context: ./backend-spring
+      dockerfile: Dockerfile
+
+    container_name: foodexpress-backend
+
+    ports:
+      - "5001:5001"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+      db_url: jdbc:mysql://host.docker.internal:3306/fullstack_ecom
+      db_username: root
+      db_password: 12345
+
+      jwt_secret_key: mZ8K6vYwT2RrQ4pLx7uN3cFh6sJd1bXg9kLm8PqRsTu=
+      jwt_access_token_expiration: 350000
+      jwt_refresh_token_expiration: 604800000
+
+      cloudinary_cloud_name: dleplgi5w
+      cloudinary_api_key: 593995698129214
+      cloudinary_api_secret: IP_Voyp4GevyZsLWBGX8Oj2FCW8
+      cloudinary_folder: ecommerce/photos
+
+      mail_username: choudhurysoumya87@gmail.com
+      mail_password: ebzkpknrvztyjems
+
+      razorpay_key: rzp_test_TAJpjqlx1aPyOW
+      razorpay_secret: CmZI8rVjQeoCJ3F6MPUtuZyv
+      razorpay_currency: INR
+
+    restart: unless-stopped
+
+
+  frontend:
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+
+    container_name: foodexpress-frontend
+
+    ports:
+      - "5173:80"
+
+    depends_on:
+      - backend
+
+    restart: unless-stopped
