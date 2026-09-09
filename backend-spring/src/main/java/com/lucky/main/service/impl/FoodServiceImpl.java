@@ -13,6 +13,10 @@ import com.lucky.main.repository.CategoryRepository;
 import com.lucky.main.repository.FoodRepository;
 import com.lucky.main.service.FoodService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,11 @@ public class FoodServiceImpl implements FoodService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "foods", key = "'all'"),
+            }
+    )
     public FoodResponse addFood(FoodRequest request, MultipartFile file) {
 
         String DEFAULT_IMAGE =
@@ -74,7 +83,11 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
+    @Cacheable(value = "foods", key = "'all'")
     public List<FoodResponse> getAllFoods() {
+
+        System.out.println("getAllFoods method executed Database Called");
+
         return foodRepository.findByActiveTrue()
                 .stream()
                 .map(food -> FoodMapper.toResponse(food))
@@ -82,24 +95,22 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
+    @Cacheable(value = "foods", key = "#id")
     public FoodResponse getFoodById(long id) {
         com.lucky.main.entity.Food food = foodRepository.findById(id).orElseThrow(() -> new FoodNotFoundException(id));
         return FoodMapper.toResponse(food);
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "foods", key = "'all'"),
+                    @CacheEvict(value = "foods", key = "#id")
+            }
+    )
     public FoodResponse deleteFoodById(long id) {
         Food food = foodRepository.findById(id)
                 .orElseThrow(() -> new FoodNotFoundException(id));
-
-        // delete image from cloudinary (if exists)
-//        if (food.getPublicId() != null) {
-//            try {
-//                cloudinaryService.deleteImage(food.getPublicId());
-//            } catch (Exception e) {
-//                System.out.println("Failed to delete image: " + e.getMessage());
-//            }
-//        }
 
         //foodRepository.delete(food);
         food.setActive(false);
@@ -138,6 +149,14 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "foods", key = "'all'")
+            },
+            put = {
+                    @CachePut(value = "foods", key = "#foodId")
+            }
+    )
     public FoodResponse updateFood(Long foodId, FoodRequest request, MultipartFile file) {
 
         Food food = foodRepository.findById(foodId)
@@ -192,15 +211,4 @@ public class FoodServiceImpl implements FoodService {
         }
     }
 
-
-    // Clean reusable method
-//    private Double calculateDiscountedPrice(Double price, Double discount) {
-//        if (price == null) return 0.0;
-//
-//        if (discount == null || discount <= 0) {
-//            return price;
-//        }
-//
-//        return price - (price * discount / 100);
-//    }
 }
