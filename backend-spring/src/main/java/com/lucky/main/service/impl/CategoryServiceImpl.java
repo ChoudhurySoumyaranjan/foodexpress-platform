@@ -11,6 +11,9 @@ import com.lucky.main.mapper.CategoryMapper;
 import com.lucky.main.repository.CategoryRepository;
 import com.lucky.main.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,10 +35,16 @@ public class CategoryServiceImpl implements CategoryService {
             "https://res.cloudinary.com/dlcckvlfx/image/upload/v1775580029/default_product.jpg";
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "category",allEntries = true)
+            }
+    )
     public CategoryResponse create(CategoryRequest request, MultipartFile file) {
 
         try {
             Category category = CategoryMapper.toEntity(request);
+            category.setActive(true);
             if (file != null && !file.isEmpty()) {
                 //imageUrl = cloudinaryService.uploadImage(file);
 
@@ -59,16 +68,17 @@ public class CategoryServiceImpl implements CategoryService {
             throw new RuntimeException("Failed to create category", e);
         }
     }
-
+//later i will implement
     @Override
     public Page<CategoryResponse> getAll(Pageable pageable) {
-        return categoryRepository.findAll(pageable)
+        return categoryRepository.findByActiveTrue(pageable)
                 .map((category)->CategoryMapper.toResponse(category));
     }
 
     @Override
+    @Cacheable(value = "category", key = "'all'")
     public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAll()
+        return categoryRepository.findAllByActiveTrue()
                 .stream()
                 .map((category -> CategoryMapper.toResponse(category)))
                 .collect(Collectors.toList());
@@ -76,8 +86,9 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
+    @Cacheable(value = "category", key = "#id")
     public CategoryResponse getById(Long id) {
-        Category category = categoryRepository.findById(id)
+        Category category = categoryRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() ->
                         new CategoryNotFoundException("Category not found with id: " + id));
 
@@ -85,9 +96,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "category",key = "'all'"),
+                    @CacheEvict(value = "category",key = "#id")
+            }
+    )
     public void delete(Long id) {
 
-        Category category = categoryRepository.findById(id)
+        Category category = categoryRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() ->
                         new CategoryNotFoundException("Category not found with id: " + id));
 
@@ -99,13 +116,20 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
 
-        categoryRepository.delete(category);
+        category.setActive(false);
+        categoryRepository.save(category);
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "category",key = "'all'"),
+                    @CacheEvict(value = "category", key = "#id")
+            }
+    )
     public CategoryResponse update(Long id, CategoryRequest request, MultipartFile multipartFile) {
 
-        Category category = categoryRepository.findById(id)
+        Category category = categoryRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() ->
                         new CategoryNotFoundException("Category not found with id: " + id));
         category.setName(request.getName());
@@ -140,6 +164,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Long totalCategoriesCount() {
-        return categoryRepository.count();
+        return categoryRepository.countByActiveTrue();
     }
 }
