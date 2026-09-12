@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FoodRepository extends JpaRepository<Food, Long> {
     List<Food> findByCategoryIdAndActiveTrue(Long categoryId);
@@ -29,4 +30,5 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
     List<Food> findByActiveTrue();
 
     List<Food> findByActiveFalse();
+    Optional<Food> findByIdAndActiveTrue(Long id);
 }
