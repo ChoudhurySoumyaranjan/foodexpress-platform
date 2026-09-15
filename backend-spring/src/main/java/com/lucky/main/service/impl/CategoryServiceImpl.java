@@ -3,6 +3,7 @@ package com.lucky.main.service.impl;
 import com.lucky.main.cloudinary.CloudinaryService;
 import com.lucky.main.dto.CategoryRequest;
 import com.lucky.main.dto.CategoryResponse;
+import com.lucky.main.dto.PageResponse;
 import com.lucky.main.entity.Category;
 import com.lucky.main.exception.CloudinaryImageException;
 import com.lucky.main.exception.category.CategoryImageException;
@@ -37,7 +38,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "category",allEntries = true)
+                    @CacheEvict(value = "category",allEntries = true),
+                    @CacheEvict(value = "categoryPage", allEntries = true)
             }
     )
     public CategoryResponse create(CategoryRequest request, MultipartFile file) {
@@ -68,11 +70,30 @@ public class CategoryServiceImpl implements CategoryService {
             throw new RuntimeException("Failed to create category", e);
         }
     }
-//later i will implement
+
     @Override
-    public Page<CategoryResponse> getAll(Pageable pageable) {
-        return categoryRepository.findByActiveTrue(pageable)
-                .map((category)->CategoryMapper.toResponse(category));
+    @Cacheable(
+            value = "categoryPage",
+            key = "#pageable.pageNumber + '-' + #pageable.pageSize"
+    )
+    public PageResponse<CategoryResponse> getAll(Pageable pageable) {
+        Page<CategoryResponse> page = categoryRepository.findByActiveTrue(pageable)  //Page<Category>
+                .map((category)->CategoryMapper.toResponse(category));  //Page<CategoryResponse>
+
+        return new PageResponse<>(  //PageResponse<CategoryResponse>
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isFirst(),
+                page.isLast()
+                );
+                // returning Page<CategoryResponse> works perfectly.
+                // However, when we directly cache Page<CategoryResponse>
+                // in Redis, Spring Data usually uses the PageImpl implementation internally.
+                // GenericJackson2JsonRedisSerializer can serialize this object, but when reading it back from Redis,
+                // Jackson may not know how to reconstruct the PageImpl object.
     }
 
     @Override
@@ -99,7 +120,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Caching(
             evict = {
                     @CacheEvict(value = "category",key = "'all'"),
-                    @CacheEvict(value = "category",key = "#id")
+                    @CacheEvict(value = "category",key = "#id"),
+                    @CacheEvict(value = "categoryPage", allEntries = true)
             }
     )
     public void delete(Long id) {
@@ -124,7 +146,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Caching(
             evict = {
                     @CacheEvict(value = "category",key = "'all'"),
-                    @CacheEvict(value = "category", key = "#id")
+                    @CacheEvict(value = "category", key = "#id"),
+                    @CacheEvict(value = "categoryPage", allEntries = true)
             }
     )
     public CategoryResponse update(Long id, CategoryRequest request, MultipartFile multipartFile) {

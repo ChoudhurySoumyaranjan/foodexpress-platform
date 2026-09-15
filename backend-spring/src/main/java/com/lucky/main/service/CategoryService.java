@@ -2,6 +2,7 @@ package com.lucky.main.service;
 
 import com.lucky.main.dto.CategoryRequest;
 import com.lucky.main.dto.CategoryResponse;
+import com.lucky.main.dto.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +13,7 @@ public interface CategoryService {
 
     CategoryResponse create(CategoryRequest request, MultipartFile multipartFile);
 
-    Page<CategoryResponse> getAll(Pageable pageable);
+    PageResponse<CategoryResponse> getAll(Pageable pageable);
 
     List<CategoryResponse> getAllCategories();
 

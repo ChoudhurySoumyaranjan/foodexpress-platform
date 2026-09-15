@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lucky.main.dto.CategoryRequest;
 import com.lucky.main.dto.CategoryResponse;
+import com.lucky.main.dto.PageResponse;
 import com.lucky.main.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,7 +35,7 @@ public class AdminCategoryController {
         return ResponseEntity.ok(categoryService.create(categoryRequest,multipartFile));
     }
     @GetMapping
-    public ResponseEntity<Page<CategoryResponse>> getAll(@PageableDefault(size = 5,sort = "id") Pageable pageable) {
+    public ResponseEntity<PageResponse<CategoryResponse>> getAll(@PageableDefault(size = 5,sort = "id") Pageable pageable) {
         return ResponseEntity.ok(categoryService.getAll(pageable));
     }
 
