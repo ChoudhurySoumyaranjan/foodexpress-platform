@@ -1,17 +1,15 @@
 package com.lucky.main.controller;
 
 import com.lucky.main.dto.ContactMessageResponse;
+import com.lucky.main.dto.PageResponse;
 import com.lucky.main.enums.TicketStatus;
 import com.lucky.main.service.ContactMessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin/api/contact")
@@ -21,14 +19,9 @@ public class AdminContactMessageController {
     private final ContactMessageService contactMessageService;
 
     @GetMapping
-    public ResponseEntity<Page<ContactMessageResponse>> getAllContactMessage(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public ResponseEntity<PageResponse<ContactMessageResponse>> getAllContactMessage(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
 
-        Page<ContactMessageResponse> contactMessageResponses = contactMessageService.getAllContactMessages(pageable);
-
-        if (!contactMessageResponses.isEmpty()) {
-            return ResponseEntity.ok(contactMessageResponses);
-        }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(contactMessageService.getAllContactMessages(pageable));
     }
 
     @PatchMapping("/{id}")
@@ -44,10 +37,10 @@ public class AdminContactMessageController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<ContactMessageResponse>> getSearchedContactMessages(
+    public ResponseEntity<PageResponse<ContactMessageResponse>> getSearchedContactMessages(
             @RequestParam(required = false, value = "keyword") String keyword,
             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        return ResponseEntity.ok(contactMessageService.getfilteredContactMessages(keyword,pageable));
+        return ResponseEntity.ok(contactMessageService.getfilteredContactMessages(keyword, pageable));
 
     }
 
