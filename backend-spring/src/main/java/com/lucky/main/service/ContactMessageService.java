@@ -2,6 +2,7 @@ package com.lucky.main.service;
 
 import com.lucky.main.dto.ContactMessageRequest;
 import com.lucky.main.dto.ContactMessageResponse;
+import com.lucky.main.dto.PageResponse;
 import com.lucky.main.enums.TicketStatus;
 import com.lucky.main.enums.TicketSubject;
 import org.springframework.data.domain.Page;
@@ -17,11 +18,11 @@ public interface ContactMessageService {
 
     List<TicketStatus> getAllTicketStatuses();
 
-    Page<ContactMessageResponse> getAllContactMessages(Pageable pageable);
+    PageResponse<ContactMessageResponse> getAllContactMessages(Pageable pageable);
 
     ContactMessageResponse updateContactMessage(Long id, TicketStatus ticketStatus);
 
-    Page<ContactMessageResponse> getfilteredContactMessages(String keyword,Pageable pageable);
+    PageResponse<ContactMessageResponse> getfilteredContactMessages(String keyword,Pageable pageable);
 
     Long getTotalContactMessageCount();
 
