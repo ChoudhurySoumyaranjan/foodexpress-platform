@@ -1,6 +1,7 @@
 package com.lucky.main.service.impl;
 
 import com.lucky.main.dto.OrderResponse;
+import com.lucky.main.dto.PageResponse;
 import com.lucky.main.dto.PlaceOrderRequest;
 import com.lucky.main.entity.*;
 import com.lucky.main.enums.OrderStatus;
@@ -15,6 +16,9 @@ import com.lucky.main.service.EmailService;
 import com.lucky.main.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,19 +35,37 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Page<OrderResponse> getOrdersByUser(Long userId, Pageable pageable) {
+    @Cacheable(value = "userOrders", key = "#userId + ':' + #pageable.pageNumber + ':' + #pageable.pageSize")
+    public PageResponse<OrderResponse> getOrdersByUser(Long userId, Pageable pageable) {
 
         userRepository.findById(userId)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
-        return orderRepository
-                .findByUser_IdOrderByOrderDateDesc(userId, pageable)
-                .map(OrderMapper::toResponse);
+        Page<OrderResponse> page =
+                orderRepository.findByUser_IdOrderByOrderDateDesc(userId, pageable) //Page<Order>
+                        .map(OrderMapper::toResponse); //Page<OrderResponse>
+
+        return new PageResponse<>(  //PageResponse<OrderResponse>
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isFirst(),
+                page.isLast()
+        );
     }
 
     @Override
     @Transactional
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "userOrders", allEntries = true),
+                    @CacheEvict(value = "paginatedOrders", allEntries = true),
+                    @CacheEvict(value = "filteredOrders", allEntries = true)
+            }
+    )
     public Long placeOrder(PlaceOrderRequest request) {
 
         User user = userRepository.findById(request.getUserId())
@@ -131,13 +153,35 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Page<OrderResponse> getAllOrders(Pageable pageable) {
-        return orderRepository.findAll(pageable)
-                .map((order) -> OrderMapper.toResponse(order));
+    @Cacheable(value = "paginatedOrders", key = "#pageable.pageNumber +' - '+ #pageable.pageSize")
+    public PageResponse<OrderResponse> getAllOrders(Pageable pageable) {
+        Page<OrderResponse> page = orderRepository.findAll(pageable)  //Page<Orders>
+                .map((order) -> OrderMapper.toResponse(order));  //Page<OrderResponse>
+        return new PageResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isFirst(),
+                page.isLast());
+
+        // returning Page<OrderResponse> works perfectly.
+        // However, when we directly cache Page<OrderResponse>
+        // in Redis, Spring Data usually uses the PageImpl implementation internally.
+        // GenericJackson2JsonRedisSerializer can serialize this object, but when reading it back from Redis,
+        // Jackson may not know how to reconstruct the PageImpl object.
     }
 
     @Override
     @Transactional
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "userOrders", allEntries = true),
+                    @CacheEvict(value = "paginatedOrders", allEntries = true),
+                    @CacheEvict(value = "filteredOrders", allEntries = true)
+            }
+    )
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
 
         Order existingOrder = orderRepository.findById(orderId)
@@ -180,14 +224,34 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Page<OrderResponse> filterOrders(String keyword, Pageable pageable) {
+    @Cacheable(value = "filteredOrders",
+            key = "#pageable.pageNumber + ':' + #pageable.pageSize + ':' + (#keyword == null ? '' : #keyword.trim())")
+    public PageResponse<OrderResponse> filterOrders(String keyword, Pageable pageable) {
 
         if (keyword == null || keyword.isBlank()) {
-            return orderRepository.findAll(pageable)
-                    .map((order) -> OrderMapper.toResponse(order));
+            Page<OrderResponse> page = orderRepository.findAll(pageable) //Page<Order>
+                    .map((order) -> OrderMapper.toResponse(order)); //Page<OrderResponse>
+            return new PageResponse<>( //PageResponse<OrderResponse>
+                    page.getContent(),
+                    page.getNumber(),
+                    page.getSize(),
+                    page.getTotalElements(),
+                    page.getTotalPages(),
+                    page.isFirst(),
+                    page.isLast()
+            );
         }
-        return orderRepository.searchOrders(keyword.trim(), pageable)
-                .map((order) -> OrderMapper.toResponse(order));
+        Page<OrderResponse> page = orderRepository.searchOrders(keyword.trim(), pageable) //Page<Order>
+                .map((order) -> OrderMapper.toResponse(order)); //Page<OrderResponse>
+        return new PageResponse<>( //PageResponse<OrderResponse>
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isFirst(),
+                page.isLast()
+        );
     }
 
     @Override

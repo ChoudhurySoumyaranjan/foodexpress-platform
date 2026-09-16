@@ -1,6 +1,7 @@
 package com.lucky.main.controller;
 
 import com.lucky.main.dto.OrderResponse;
+import com.lucky.main.dto.PageResponse;
 import com.lucky.main.dto.PlaceOrderRequest;
 import com.lucky.main.enums.OrderStatus;
 import com.lucky.main.enums.PaymentType;
@@ -43,7 +44,7 @@ public class OrderController {
 
     @GetMapping
     //@PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<OrderResponse>> getOrdersByUser(
+    public ResponseEntity<PageResponse<OrderResponse>> getOrdersByUser(
             @RequestHeader("Authorization") String authHeader,
             @PageableDefault(size = 5, sort = "id") Pageable pageable
     ) {

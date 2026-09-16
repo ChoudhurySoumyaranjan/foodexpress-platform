@@ -1,6 +1,7 @@
 package com.lucky.main.controller;
 
 import com.lucky.main.dto.OrderResponse;
+import com.lucky.main.dto.PageResponse;
 import com.lucky.main.enums.OrderStatus;
 import com.lucky.main.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class AdminOrderController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Page<OrderResponse>> getAllOrders(
+    public ResponseEntity<PageResponse<OrderResponse>> getAllOrders(
             @PageableDefault(
                     size = 5,
                     sort = "orderDate",
@@ -36,7 +37,7 @@ public class AdminOrderController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<OrderResponse>> filterOrders(@PageableDefault(size = 5, sort = "id") Pageable pageable, @RequestParam("keyword") String keyword) {
+    public ResponseEntity<PageResponse<OrderResponse>> filterOrders(@PageableDefault(size = 5, sort = "id") Pageable pageable, @RequestParam("keyword") String keyword) {
         return ResponseEntity.ok(orderService.filterOrders(keyword, pageable));
     }
 
