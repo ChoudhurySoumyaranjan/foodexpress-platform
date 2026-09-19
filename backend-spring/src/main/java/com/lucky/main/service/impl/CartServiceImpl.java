@@ -13,6 +13,9 @@ import com.lucky.main.repository.FoodRepository;
 import com.lucky.main.repository.UserRepository;
 import com.lucky.main.service.CartService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +60,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @CacheEvict(value = "cartItems", key = "#request.userId")
     public void addToCart(CartRequest request) {
 
         User user = userRepository.findById(request.getUserId())
@@ -117,6 +121,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Cacheable(value = "cartItems", key = "#userId")
     public List<CartResponse> getCart(Long userId) {
 
         Cart cart = getCartByUserId(userId);
@@ -128,6 +133,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @CacheEvict(value = "cartItems", key = "#userId")
     public void increaseQuantity(Long userId, Long foodId) {
 
         Cart cart = getCartByUserId(userId);
@@ -146,6 +152,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @CacheEvict(value = "cartItems", key = "#userId")
     public void decreaseQuantity(Long userId, Long foodId) {
 
         Cart cart = getCartByUserId(userId);
@@ -165,6 +172,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @CacheEvict(value = "cartItems", key = "#userId")
     public void removeItem(Long userId, Long foodId) {
 
         Cart cart = getCartByUserId(userId);
@@ -175,6 +183,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @CacheEvict(value = "cartItems", key = "#userId")
     public void clearCart(Long userId) {
 
         Cart cart = getCartByUserId(userId);
