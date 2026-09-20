@@ -3,6 +3,7 @@ package com.lucky.main.service.impl;
 import com.lucky.main.cloudinary.CloudinaryService;
 import com.lucky.main.dto.FoodRequest;
 import com.lucky.main.dto.FoodResponse;
+import com.lucky.main.dto.PageResponse;
 import com.lucky.main.entity.Category;
 import com.lucky.main.entity.Food;
 import com.lucky.main.exception.category.CategoryNotFoundException;
@@ -39,9 +40,10 @@ public class FoodServiceImpl implements FoodService {
     @Caching(
             evict = {
                     @CacheEvict(value = "foods", allEntries = true),
-                    @CacheEvict(value = "foodsSearch", allEntries = true),
+                    @CacheEvict(value = "searchFoods", allEntries = true),
                     @CacheEvict(value = "foodsByCategory", allEntries = true),
-                    //@CacheEvict( value = "foodsPage", allEntries = true)
+                    @CacheEvict( value = "foodsPage", allEntries = true),
+                    @CacheEvict( value = "foodList", allEntries = true)
             }
     )
     public FoodResponse addFood(FoodRequest request, MultipartFile file) {
@@ -75,22 +77,31 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-//    @Cacheable(
-//            value = "foodsPage",
-//            key = "#pageable.pageNumber + '-' + #pageable.pageSize"
-//    )
-    public Page<FoodResponse> getPaginatedFoods(Pageable pageable) {
+    @Cacheable(
+            value = "foodsPage",
+            key = "#pageable.pageNumber + '-' + #pageable.pageSize"
+    )
+    public PageResponse<FoodResponse> getPaginatedFoods(Pageable pageable) {
 
         try {
-            return foodRepository.findByActiveTrue(pageable)
-                    .map(food -> FoodMapper.toResponse(food));
+            Page<FoodResponse> page= foodRepository.findByActiveTrue(pageable) //Page<Food>
+                    .map(food -> FoodMapper.toResponse(food)); //Page<FoodResponse>
+            return new PageResponse<>(
+                    page.getContent(),
+                    page.getNumber(),
+                    page.getSize(),
+                    page.getTotalElements(),
+                    page.getTotalPages(),
+                    page.isFirst(),
+                    page.isLast()  //PageResponse<FoodResponse>
+                    );
         } catch (Exception e) {
             throw new FoodNotFoundException(e.getMessage());
         }
     }
 
     @Override
-    @Cacheable(value = "foods", key = "'all'")
+    @Cacheable(value = "foodList", key = "'all'")
     public List<FoodResponse> getAllFoods() {
 
        // System.out.println("getAllFoods method executed Database Called");
@@ -111,10 +122,11 @@ public class FoodServiceImpl implements FoodService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "foods", allEntries = true),
-                    @CacheEvict(value = "foodsSearch", allEntries = true),
+                    @CacheEvict(value = "foods", key = "#id"),
+                    @CacheEvict(value = "searchFoods", allEntries = true),
                     @CacheEvict(value = "foodsByCategory", allEntries = true),
-                    //@CacheEvict( value = "foodsPage", allEntries = true)
+                    @CacheEvict( value = "foodsPage", allEntries = true),
+                    @CacheEvict( value = "foodList", allEntries = true)
             }
     )
     public FoodResponse deleteFoodById(long id) {
@@ -142,7 +154,10 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    @Cacheable(value = "foodsSearch", key = "#keyword")
+    @Cacheable(
+            value = "searchFoods",
+            key = "#keyword == null || #keyword.trim() == '' ? 'all' : #keyword.trim().toLowerCase()"
+    )
     public List<FoodResponse> filterFoodsByKeyword(String keyword) {
         try {
             return foodRepository.searchFoods(keyword)
@@ -162,10 +177,10 @@ public class FoodServiceImpl implements FoodService {
     @Override
     @Caching(
             evict = {
-                    @CacheEvict(value = "foods", allEntries = true),
-                    @CacheEvict(value = "foodsSearch", allEntries = true),
+                    @CacheEvict(value = "searchFoods", allEntries = true),
                     @CacheEvict(value = "foodsByCategory", allEntries = true),
-//                    @CacheEvict( value = "foodsPage", allEntries = true)
+                    @CacheEvict( value = "foodsPage", allEntries = true),
+                    @CacheEvict( value = "foodList", allEntries = true)
             },
             put = {
                     @CachePut(value = "foods", key = "#foodId")

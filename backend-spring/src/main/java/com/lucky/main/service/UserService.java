@@ -1,9 +1,6 @@
 package com.lucky.main.service;
 
-import com.lucky.main.dto.ChangePasswordRequest;
-import com.lucky.main.dto.RegisterRequest;
-import com.lucky.main.dto.UpdateUserDetailsRequest;
-import com.lucky.main.dto.UserResponse;
+import com.lucky.main.dto.*;
 import com.lucky.main.enums.Role;
 import com.lucky.main.entity.User;
 import com.lucky.main.exception.UserNotFoundException;
@@ -15,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    Page<UserResponse> getAllUsers(Pageable pageable);
+    PageResponse<UserResponse> getAllUsers(Pageable pageable);
 
     UserResponse addUser(RegisterRequest registerRequest) throws IOException, UserNotFoundException;
 

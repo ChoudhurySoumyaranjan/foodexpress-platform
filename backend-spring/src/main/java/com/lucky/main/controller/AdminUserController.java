@@ -1,5 +1,6 @@
 package com.lucky.main.controller;
 
+import com.lucky.main.dto.PageResponse;
 import com.lucky.main.dto.UserResponse;
 import com.lucky.main.enums.Role;
 import com.lucky.main.exception.UserNotFoundException;
@@ -22,7 +23,7 @@ public class AdminUserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<Page<UserResponse>> getAllUsers(
+    public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
             @PageableDefault(size = 10,sort = "id") Pageable pageable
     ) {
         return ResponseEntity.ok(userService.getAllUsers(pageable));

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lucky.main.dto.FoodRequest;
 import com.lucky.main.dto.FoodResponse;
+import com.lucky.main.dto.PageResponse;
 import com.lucky.main.exception.food.FoodException;
 import com.lucky.main.service.FoodService;
 import lombok.RequiredArgsConstructor;
@@ -85,10 +86,10 @@ public class AdminFoodController {
 
 
     @GetMapping
-    public ResponseEntity<Page<FoodResponse>> getPaginatedFood(@PageableDefault(size = 7, sort = "id") Pageable pageable) {
-        Page<FoodResponse> foodResponses = foodService.getPaginatedFoods(pageable);
+    public ResponseEntity<PageResponse<FoodResponse>> getPaginatedFood(@PageableDefault(size = 7, sort = "id") Pageable pageable) {
+        PageResponse<FoodResponse> foodResponses = foodService.getPaginatedFoods(pageable);
 
-        if (foodResponses.isEmpty()) {
+        if (foodResponses.getContent().isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
