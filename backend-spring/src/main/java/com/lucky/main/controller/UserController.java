@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
+
 public class UserController {
     public final UserService userService;
     public final JwtService jwtService;

@@ -1,9 +1,6 @@
 package com.lucky.main.service.impl;
 
-import com.lucky.main.dto.ChangePasswordRequest;
-import com.lucky.main.dto.RegisterRequest;
-import com.lucky.main.dto.UpdateUserDetailsRequest;
-import com.lucky.main.dto.UserResponse;
+import com.lucky.main.dto.*;
 import com.lucky.main.entity.User;
 import com.lucky.main.enums.Role;
 import com.lucky.main.exception.UserNotFoundException;
@@ -11,6 +8,9 @@ import com.lucky.main.mapper.UserMapper;
 import com.lucky.main.repository.UserRepository;
 import com.lucky.main.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,12 +29,28 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Page<UserResponse> getAllUsers(Pageable pageable) {
-        return userRepository.findByRolesContaining(Role.USER, pageable)
-                .map(UserMapper::toResponse);
+    @Cacheable(value = "allUsers", key="#pageable.pageNumber +' - '+ #pageable.pageSize")
+    public PageResponse<UserResponse> getAllUsers(Pageable pageable) {
+         Page<UserResponse> page =userRepository.findByRolesContaining(Role.USER, pageable) //Page<User>
+                .map(UserMapper::toResponse); //Page<UserResponse>
+         return new PageResponse<>(
+                 page.getContent(),
+                 page.getNumber(),
+                 page.getSize(),
+                 page.getTotalElements(),
+                 page.getTotalPages(),
+                 page.isFirst(),
+                 page.isLast()  //PageResponse<UserResponse>
+         );
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "allUsers", allEntries = true),
+                    @CacheEvict(value = "filteredUser",allEntries = true)
+            }
+    )
     public UserResponse addUser(RegisterRequest request) throws UserNotFoundException {
 
         User user = User.builder()
@@ -70,6 +86,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "allUsers", allEntries = true),
+                    @CacheEvict(value = "filteredUser",allEntries = true)
+            }
+    )
     public void deleteUser(Long id) throws UserNotFoundException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User you want to delete is not Present in DB"));
@@ -82,6 +104,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "allUsers", allEntries = true),
+                    @CacheEvict(value = "filteredUser",allEntries = true)
+            }
+    )
     public UserResponse updateUser(Long id, UpdateUserDetailsRequest userDetailsRequest) throws UserNotFoundException {
         User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("No User Found"));
         if (ObjectUtils.isEmpty(userDetailsRequest)) {
@@ -99,18 +127,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "allUsers", allEntries = true),
+                    @CacheEvict(value = "filteredUser",allEntries = true)
+            }
+    )
     public UserResponse blockUser(Long id) throws UserNotFoundException {
         com.lucky.main.entity.User user = findUser(id);
         user.setEnabled(false);
-        userRepository.save(user);
         return UserMapper.toResponse(userRepository.save(user));
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "allUsers", allEntries = true),
+                    @CacheEvict(value = "filteredUser",allEntries = true)
+            }
+    )
     public UserResponse unBlockUser(Long id) throws UserNotFoundException {
         com.lucky.main.entity.User user = findUser(id);
         user.setEnabled(true);
-        userRepository.save(user);
         return UserMapper.toResponse(userRepository.save(user));
     }
 
@@ -120,6 +158,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = "filteredUser",
+            key = "#keyword == null || #keyword.trim() == '' ? 'all' : #keyword.trim().toLowerCase()")
     public List<UserResponse> filterUsers(String keyword) {
         if (keyword == null || keyword.isBlank()) {
             return userRepository.findAll()
