@@ -9,6 +9,7 @@ import com.lucky.main.repository.OrderRepository;
 import com.lucky.main.repository.UserRepository;
 import com.lucky.main.service.AnalyticsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final ContactMessageRepository contactMessageRepository;
 
     @Override
+    @Cacheable(value = "revenueAnalytics",key = "'last7days'")
     public List<RevenueChartDTO> getRevenueLast7Days() {
 
         LocalDate today = LocalDate.now();
@@ -81,6 +83,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return response;
     }
     @Override
+    @Cacheable(value = "orderStatusAnalytics",key = "'orderStatus'")
     public List<OrderStatusChartDTO> getOrderStatusChart() {
 
         List<Object[]> result = orderRepository.getOrderStatusCount();
@@ -94,6 +97,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     }
     @Override
+    @Cacheable(value = "orderAnalytics",key = "'lastOrders'")
     public List<RecentOrderDTO> getRecentOrders() {
 
         return orderRepository.findTop5ByOrderByOrderDateDesc()
@@ -109,6 +113,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     }
     @Override
+    @Cacheable(value = "topSellingAnalytics",key = "'topSold'")
     public List<TopSellingFoodDTO> getTopSellingFoods() {
 
         return orderItemRepository.findTopSellingFoods(
@@ -125,6 +130,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     }
     @Override
+    @Cacheable(value = "recentQueryAnalytics",key = "'latestQuery'")
     public List<RecentQueryDTO> getRecentQueries() {
 
         Pageable pageable = PageRequest.of(0, 5);

@@ -32,7 +32,8 @@ public class ContactMessageServiceImpl implements ContactMessageService {
     @Caching(
             evict = {
                     @CacheEvict(value = "contactMessagePage", allEntries = true),
-                    @CacheEvict(value = "filteredContactMessagePage", allEntries = true)
+                    @CacheEvict(value = "filteredContactMessagePage", allEntries = true),
+                    @CacheEvict(value = "recentQueryAnalytics",allEntries = true)
             }
     )
     public ContactMessageResponse saveContactMessage(
@@ -105,7 +106,8 @@ public class ContactMessageServiceImpl implements ContactMessageService {
     @Caching(
             evict = {
                     @CacheEvict(value = "contactMessagePage", allEntries = true),
-                    @CacheEvict(value = "filteredContactMessagePage", allEntries = true)
+                    @CacheEvict(value = "filteredContactMessagePage", allEntries = true),
+                    @CacheEvict(value = "recentQueryAnalytics", allEntries = true)
             }
     )
     public ContactMessageResponse updateContactMessage(Long id, TicketStatus ticketStatus) {
