@@ -63,7 +63,13 @@ public class OrderServiceImpl implements OrderService {
             evict = {
                     @CacheEvict(value = "userOrders", allEntries = true),
                     @CacheEvict(value = "paginatedOrders", allEntries = true),
-                    @CacheEvict(value = "filteredOrders", allEntries = true)
+                    @CacheEvict(value = "filteredOrders", allEntries = true),
+                    @CacheEvict(value = {
+                            "revenueAnalytics",
+                            "orderStatusAnalytics",
+                            "orderAnalytics",
+                            "topSellingAnalytics"
+                    }, allEntries = true)
             }
     )
     public Long placeOrder(PlaceOrderRequest request) {
@@ -179,7 +185,10 @@ public class OrderServiceImpl implements OrderService {
             evict = {
                     @CacheEvict(value = "userOrders", allEntries = true),
                     @CacheEvict(value = "paginatedOrders", allEntries = true),
-                    @CacheEvict(value = "filteredOrders", allEntries = true)
+                    @CacheEvict(value = "filteredOrders", allEntries = true),
+                    @CacheEvict(value = "orderStatusAnalytics", allEntries = true),
+                    @CacheEvict(value = "orderAnalytics", allEntries = true),
+                    @CacheEvict(value = "revenueAnalytics", allEntries = true)
             }
     )
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
