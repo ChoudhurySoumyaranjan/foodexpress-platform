@@ -1,20 +1,23 @@
 package com.lucky.main.config;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.lucky.main.dto.CartResponse;
+import com.lucky.main.dto.RecentOrderDTO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -24,37 +27,19 @@ public class RedisConfig {
     public RedisCacheManager cacheManager(
             RedisConnectionFactory redisConnectionFactory) {
 
-        // ObjectMapper for Redis JSON serialization
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // Support Java 8 date/time classes like LocalDateTime
-        objectMapper.registerModule(new JavaTimeModule());
-
-        // Store dates as readable ISO-8601 strings
-        objectMapper.disable(
-                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
-        );
-
-        // Allow Redis to preserve Java object type information
-        BasicPolymorphicTypeValidator ptv =
-                BasicPolymorphicTypeValidator.builder()
-                        .allowIfSubType("com.lucky.main")
-                        .allowIfSubType("java.util")
-                        .build();
-
-        objectMapper.activateDefaultTyping(
-                ptv,
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY
-        );
-
-        // JSON serializer
         GenericJackson2JsonRedisSerializer jsonSerializer =
-                GenericJackson2JsonRedisSerializer.builder()
-                        .objectMapper(objectMapper)
-                        .build();
+                new GenericJackson2JsonRedisSerializer()
+                        .configure(objectMapper -> {
 
-        // Default configuration
+                            objectMapper.registerModule(
+                                    new JavaTimeModule()
+                            );
+
+                            objectMapper.disable(
+                                    SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
+                            );
+                        });
+
         RedisCacheConfiguration defaultConfig =
                 RedisCacheConfiguration.defaultCacheConfig()
                         .entryTtl(Duration.ofMinutes(10))
@@ -63,27 +48,52 @@ public class RedisConfig {
                                         .fromSerializer(jsonSerializer)
                         );
 
-        // Cache-specific TTL
         Map<String, RedisCacheConfiguration> cacheConfigurations =
                 new HashMap<>();
 
-        // Food → 10 minutes
         cacheConfigurations.put(
                 "foods",
                 defaultConfig
         );
 
-        // Category → 30 minutes
-        // cacheConfigurations.put(
-        //         "category",
-        //         defaultConfig.entryTtl(Duration.ofMinutes(30))
-        // );
+        // Only for cartItems
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(
+                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
+        );
 
-        // Order → 5 minutes
-        // cacheConfigurations.put(
-        //         "orders",
-        //         defaultConfig.entryTtl(Duration.ofMinutes(5))
-        // );
+        JavaType cartType = objectMapper.getTypeFactory()
+                .constructCollectionType(List.class, CartResponse.class);
+
+        JavaType recentOrderType = objectMapper.getTypeFactory()
+                .constructCollectionType(List.class, RecentOrderDTO.class);
+
+        cacheConfigurations.put(
+                "cartItems",
+                defaultConfig.serializeValuesWith(
+                        RedisSerializationContext.SerializationPair
+                                .fromSerializer(
+                                        new Jackson2JsonRedisSerializer<>(
+                                                objectMapper,
+                                                cartType
+                                        )
+                                )
+                )
+        );
+
+        cacheConfigurations.put(
+                "orderAnalytics",
+                defaultConfig.serializeValuesWith(
+                        RedisSerializationContext.SerializationPair
+                                .fromSerializer(
+                                        new Jackson2JsonRedisSerializer<>(
+                                                objectMapper,
+                                                recentOrderType
+                                        )
+                                )
+                )
+        );
 
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(defaultConfig)
@@ -91,4 +101,3 @@ public class RedisConfig {
                 .build();
     }
 }
-
