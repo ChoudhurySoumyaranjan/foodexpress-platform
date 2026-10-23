@@ -21,7 +21,6 @@ import AdminLoginPage from "../pages/admin/AdminLoginPage";
 import AdminLayout from "../layouts/AdminLayout";
 import UserRoute from "./UserRoute";
 import PublicRoute from "./PublicRoute";
-import FoodCard from "../components/FoodCard";
 import FoodDetails from "../components/FoodDetails";
 import DashboardOverview from "../components/DashboardOverview";
 import AdminCategoryPage from "../pages/admin/AdminCategoryPage";
@@ -59,6 +58,10 @@ export const router = createBrowserRouter([
           {
             path: "/forgot-password",
             element: <ForgotPasswordPage />,
+          },
+          {
+            path: "/reset-password",
+            element: <ResetPasswordPage />,
           },
           {
             path: "/api/auth/reset-password",

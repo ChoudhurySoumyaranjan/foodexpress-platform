@@ -39,12 +39,18 @@ const CartPage = () => {
   }
 
   const itemTotal = items.reduce(
-    (sum, item) => sum + item.originalPrice * item.quantity,
+    (sum, item) =>
+      sum +
+      Number(item.originalPrice || item.price || item.discountedPrice || 0) *
+        item.quantity,
     0,
   );
 
   const discountedTotal = items.reduce(
-    (sum, item) => sum + item.discountedPrice * item.quantity,
+    (sum, item) =>
+      sum +
+      Number(item.discountedPrice || item.price || item.originalPrice || 0) *
+        item.quantity,
     0,
   );
 

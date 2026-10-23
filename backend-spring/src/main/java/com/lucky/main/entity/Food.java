@@ -28,6 +28,7 @@ public class Food {
     private Double price;
     private Integer stock;
     private Double discount;
-    private Boolean active=true;
+    @Builder.Default
+    private Boolean active = true;
     private Double discountedPrice;
 }

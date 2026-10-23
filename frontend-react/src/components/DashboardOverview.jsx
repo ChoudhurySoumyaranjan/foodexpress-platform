@@ -42,45 +42,50 @@ const DashboardOverview = () => {
   const fetchRecentUsers = async () => {
     try {
       const response = await getRecentUsers();
-      setRecentUsers(response.data);
+      setRecentUsers(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error(error);
+      setRecentUsers([]);
     }
   };
 
   const fetchRecentQueries = async () => {
     try {
       const response = await getRecentQueries();
-      setRecentQueries(response.data);
+      setRecentQueries(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error(error);
+      setRecentQueries([]);
     }
   };
 
   const fetchRecentOrders = async () => {
     try {
       const response = await getRecentOrders();
-      setRecentOrders(response.data);
+      setRecentOrders(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error(error);
+      setRecentOrders([]);
     }
   };
 
   const fetchTopSellingFoods = async () => {
     try {
       const response = await getTopSellingFoods();
-      setTopFoods(response.data);
+      setTopFoods(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error(error);
+      setTopFoods([]);
     }
   };
 
   const fetchRevenueChart = async () => {
     try {
       const response = await getRevenueLast7Days();
-      setRevenueChart(response.data);
+      setRevenueChart(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error(error);
+      setRevenueChart([]);
     } finally {
       setLoading(false);
     }
@@ -89,9 +94,10 @@ const DashboardOverview = () => {
   const fetchOrderStatusChart = async () => {
     try {
       const response = await getOrderStatusChart();
-      setOrderStatusChart(response.data);
+      setOrderStatusChart(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error(error);
+      setOrderStatusChart([]);
     }
   };
 
@@ -184,14 +190,6 @@ const DashboardOverview = () => {
     );
   }
 
-  if (!loading && revenueChart.length === 0) {
-    return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 h-[320px] flex items-center justify-center">
-        <p className="text-sm text-gray-400">No revenue data available</p>
-      </div>
-    );
-  }
-
   const cardClass = "bg-white rounded-2xl border border-gray-100 shadow-sm";
 
   return (
@@ -206,8 +204,13 @@ const DashboardOverview = () => {
             </h2>
             <p className="text-xs text-gray-400 mt-0.5">Last 7 days</p>
           </div>
-          <ResponsiveContainer width="100%" height="85%">
-            <BarChart data={revenueChart}>
+          {revenueChart.length === 0 ? (
+            <div className="h-[80%] flex items-center justify-center">
+              <p className="text-sm text-gray-400">No revenue data available</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="85%">
+              <BarChart data={revenueChart}>
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
@@ -245,6 +248,7 @@ const DashboardOverview = () => {
               />
             </BarChart>
           </ResponsiveContainer>
+          )}
         </div>
 
         {/* Order Status */}

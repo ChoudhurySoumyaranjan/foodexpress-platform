@@ -10,7 +10,7 @@ const categorySlice = createSlice({
 
   reducers: {
     setCategories: (state, action) => {
-      state.categoryList = action.payload;
+      state.categoryList = Array.isArray(action.payload) ? action.payload : [];
     },
 
     addCategory: (state, action) => {
@@ -19,7 +19,7 @@ const categorySlice = createSlice({
 
     removeCategory: (state, action) => {
       state.categoryList = state.categoryList.filter(
-        (category) =>{ return category.id !== action.payload}
+        (category) => { return category.id !== action.payload }
       );
     },
 

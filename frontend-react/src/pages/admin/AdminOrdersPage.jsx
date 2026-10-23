@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { CircularProgress } from "@mui/material";
 import AdminOrderCard from "../../components/AdminOrderCard";
 import {
@@ -15,9 +15,9 @@ const AdminOrdersPage = () => {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [pageSize, setPageSize] = useState(4);
+  const pageSize = 4;
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -51,7 +51,7 @@ const AdminOrdersPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, pageSize, search]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -59,7 +59,7 @@ const AdminOrdersPage = () => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [search, currentPage]);
+  }, [fetchOrders]);
 
   const handleNextPageRequest = () => {
     if (currentPage < totalPages - 1) {
@@ -190,11 +190,10 @@ const AdminOrdersPage = () => {
                   key={index}
                   onClick={() => setCurrentPage(index)}
                   className={`rounded-lg px-4 py-2 text-sm font-medium
-            ${
-              currentPage === index
-                ? "bg-[#FC8019] text-white"
-                : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-            }`}
+            ${currentPage === index
+                      ? "bg-[#FC8019] text-white"
+                      : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   {index + 1}
                 </button>

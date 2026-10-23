@@ -1,6 +1,6 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   addToCart,
   increaseQuantity,
@@ -12,6 +12,7 @@ import {
   decreaseCartApi,
 } from "../api/service/cartService";
 import { fetchCart } from "../redux/thunks/cartThunk";
+import { fetchAllFoods } from "../api/service/foodService";
 import {
   ArrowLeft,
   Clock3,
@@ -26,21 +27,81 @@ import {
 
 const FoodDetails = () => {
   const navigate = useNavigate();
-  const { state: food } = useLocation();
+  const { id } = useParams();
+  const location = useLocation();
+  const [food, setFood] = useState(location.state || null);
+  const [fetching, setFetching] = useState(!location.state);
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  if (!food) {
+  const cartItems = useSelector((state) => state.cart.items);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!food && id) {
+      let isMounted = true;
+      fetchAllFoods()
+        .then((res) => {
+          if (isMounted) {
+            const list = Array.isArray(res.data) ? res.data : [];
+            const found = list.find((item) => String(item.id) === String(id));
+            setFood(found || null);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to load food:", err);
+        })
+        .finally(() => {
+          if (isMounted) setFetching(false);
+        });
+      return () => {
+        isMounted = false;
+      };
+    } else {
+      setFetching(false);
+    }
+  }, [id, food]);
+
+  // ========== CART HANDLERS ==========
+  const handleCartAction = useCallback(
+    async (actionFn) => {
+      setIsLoading(true);
+      try {
+        await actionFn();
+        if (isAuthenticated && user?.id) {
+          await dispatch(fetchCart(user.id));
+        }
+      } catch {
+        alert("Failed to update cart");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isAuthenticated, dispatch, user?.id],
+  );
+
+  if (fetching) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center text-gray-400 text-sm">
-        Food Not Found
+      <div className="min-h-[60vh] flex items-center justify-center text-gray-500 text-sm">
+        Loading food details...
       </div>
     );
   }
 
-  const cartItems = useSelector((state) => state.cart.items);
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  if (!food) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-gray-500 gap-3">
+        <p className="text-base font-medium">Food Not Found</p>
+        <button
+          onClick={() => navigate("/")}
+          className="px-4 py-2 bg-orange-500 text-white rounded-xl text-sm font-semibold hover:bg-orange-600 transition"
+        >
+          Back to Home
+        </button>
+      </div>
+    );
+  }
 
   const cartItem = cartItems.find((item) => item.foodId === food.id);
   const isAdmin = user?.roles?.includes("ADMIN");
@@ -70,24 +131,6 @@ const FoodDetails = () => {
     "No artificial colors",
     "Hygienically packed",
   ];
-
-  // ========== CART HANDLERS ==========
-  const handleCartAction = useCallback(
-    async (actionFn) => {
-      setIsLoading(true);
-      try {
-        await actionFn();
-        if (isAuthenticated && user?.id) {
-          await dispatch(fetchCart(user.id)).unwrap();
-        }
-      } catch {
-        alert("Failed to update cart");
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [isAuthenticated, dispatch, user?.id],
-  );
 
   const handleAdd = () => {
     if (stock <= 0) return alert("Out of stock");
@@ -180,6 +223,16 @@ const FoodDetails = () => {
                 {categoryName && (
                   <span className="bg-white/90 backdrop-blur-md text-[11px] px-2.5 py-1 rounded-full font-medium text-gray-700 shadow-sm">
                     {categoryName}
+                  </span>
+                )}
+                {isVeg ? (
+                  <span className="bg-emerald-50 text-emerald-700 text-[11px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 shadow-sm">
+                    <Leaf size={11} strokeWidth={2.5} />
+                    VEG
+                  </span>
+                ) : (
+                  <span className="bg-red-50 text-red-700 text-[11px] px-2.5 py-1 rounded-full font-medium shadow-sm">
+                    NON-VEG
                   </span>
                 )}
               </div>

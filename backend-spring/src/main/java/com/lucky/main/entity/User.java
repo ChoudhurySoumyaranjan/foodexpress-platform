@@ -57,6 +57,7 @@ public class User implements UserDetails {
     @NotBlank(message = "Address is Required")
     private String address;
 
+    @Builder.Default
     private boolean enabled = true;
 
     @CreationTimestamp

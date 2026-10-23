@@ -30,19 +30,20 @@ const ProfilePage = () => {
     address: "",
   });
 
+
+  const loadProfile = () => {
+    return getUserInformation()
+      .then((res) => {
+        setUser(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
   useEffect(() => {
     loadProfile();
   }, []);
-
-  const loadProfile = async () => {
-    try {
-      const res = await getUserInformation();
-
-      setUser(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   if (!user) {
     return (
@@ -103,11 +104,10 @@ const ProfilePage = () => {
             <p className="text-gray-500 mt-2">{user.roles?.join(", ")}</p>
 
             <span
-              className={`mt-4 px-4 py-1 rounded-full text-sm font-medium ${
-                user.isEnabled
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
+              className={`mt-4 px-4 py-1 rounded-full text-sm font-medium ${user.isEnabled
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+                }`}
             >
               {user.isEnabled ? "Active Account" : "Disabled Account"}
             </span>
@@ -138,7 +138,7 @@ const ProfilePage = () => {
               onClick={() => setShowPasswordModal(true)}
               className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 transition"
             >
-              <Lock size={20}  className="text-orange-500" />
+              <Lock size={20} className="text-orange-500" />
               Change Password
             </button>
           </div>

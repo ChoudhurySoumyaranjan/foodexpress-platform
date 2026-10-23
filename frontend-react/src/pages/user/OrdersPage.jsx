@@ -10,7 +10,7 @@ const OrdersPage = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [pageSize, setPageSize] = useState(4);
+  const pageSize = 4;
 
   const { user } = useSelector((state) => state.auth);
 
@@ -291,11 +291,10 @@ const OrdersPage = () => {
                       <button
                         key={index}
                         onClick={() => setCurrentPage(index)}
-                        className={`flex h-9 min-w-9 items-center justify-center rounded-lg px-3 text-sm font-semibold transition ${
-                          currentPage === index
+                        className={`flex h-9 min-w-9 items-center justify-center rounded-lg px-3 text-sm font-semibold transition ${currentPage === index
                             ? "bg-[#FC8019] text-white shadow-sm"
                             : "text-gray-600 hover:bg-orange-50 hover:text-[#FC8019]"
-                        }`}
+                          }`}
                       >
                         {index + 1}
                       </button>

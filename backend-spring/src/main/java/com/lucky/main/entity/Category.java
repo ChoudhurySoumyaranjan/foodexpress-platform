@@ -29,5 +29,6 @@ public class Category {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Food> foods;  //non owning (parent side)
-    private Boolean active=true;
+    @Builder.Default
+    private Boolean active = true;
 }

@@ -23,7 +23,7 @@ const SearchPage = () => {
       try {
         const response = await getCategories();
 
-        setCategories(response.data);
+        setCategories(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.log(error);
       } finally {
@@ -53,7 +53,7 @@ const SearchPage = () => {
         //Search API
         const response = await fetchFoodsByKeyword(searchTerm);
 
-        setFoods(response.data);
+        setFoods(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.log(error);
       } finally {
@@ -74,7 +74,7 @@ const SearchPage = () => {
 
       const response = await fetchFoodsByCategory(categoryId);
 
-      setFoods(response.data);
+      setFoods(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.log(error);
     } finally {

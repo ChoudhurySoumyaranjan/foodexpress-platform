@@ -47,7 +47,7 @@ public class FoodController {
     public ResponseEntity<List<FoodResponse>> getFoodsBySearch(@RequestParam String keyword) {
         java.util.List<FoodResponse> response = foodService.filterFoodsByKeyword(keyword);
         if (response.isEmpty()) {
-            ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(response);
     }

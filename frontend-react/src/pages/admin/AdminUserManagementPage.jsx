@@ -1,6 +1,6 @@
 import { Visibility, Search } from "@mui/icons-material";
 import { CircularProgress } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 
 import UserCardDetails from "../../components/UserCardDetails";
@@ -22,24 +22,26 @@ const AdminUserManagementPage = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getAllUsers(currentPage, pageSize);
       setUsers(response.data.content || []);
       setTotalPages(response.data.totalPages);
-      setPageSize(response.data.size);
+      if (response.data.size && response.data.size !== pageSize) {
+        setPageSize(response.data.size);
+      }
     } catch (error) {
       console.log(error);
       toast.error("Failed to load users");
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, pageSize]);
 
   useEffect(() => {
     loadUsers();
-  }, [currentPage, pageSize]);
+  }, [loadUsers]);
 
   const handleBlockUser = async (id) => {
     try {

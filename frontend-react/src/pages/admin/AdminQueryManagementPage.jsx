@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Search, Inbox } from "lucide-react";
 import QueryDetailsModal from "../../components/QueryDetailsModal";
 
@@ -23,7 +23,7 @@ export default function AdminQueryManagementPage() {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
 
-  const fetchQueries = async () => {
+  const fetchQueries = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -44,12 +44,12 @@ export default function AdminQueryManagementPage() {
       setQueries(data.content || []);
       setTotalPages(data.totalPages);
       setPageSize(data.size);
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch tickets");
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, pageSize, searchKeyword]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -57,9 +57,9 @@ export default function AdminQueryManagementPage() {
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [currentPage, searchKeyword]);
+  }, [fetchQueries]);
 
-  
+
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -360,11 +360,10 @@ export default function AdminQueryManagementPage() {
                   key={index}
                   onClick={() => setCurrentPage(index)}
                   className={`rounded-lg px-4 py-2 text-sm font-medium
-            ${
-              currentPage === index
-                ? "bg-[#FC8019] text-white"
-                : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-            }`}
+            ${currentPage === index
+                      ? "bg-[#FC8019] text-white"
+                      : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   {index + 1}
                 </button>
@@ -389,6 +388,7 @@ export default function AdminQueryManagementPage() {
 
       {selectedQuery && (
         <QueryDetailsModal
+          key={selectedQuery.id}
           selectedQuery={selectedQuery}
           setSelectedQuery={setSelectedQuery}
           fetchAllQueries={fetchQueries}

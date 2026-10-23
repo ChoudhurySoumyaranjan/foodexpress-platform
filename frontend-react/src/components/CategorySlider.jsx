@@ -19,33 +19,38 @@ export default function CategorySlider() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     // Prevent unnecessary API calls
     if (categories.length > 0) {
       setLoading(false);
       return;
     }
 
+    let isMounted = true;
     const fetchAllCategories = async () => {
       try {
         const response = await getCategories();
-
-        dispatch(setCategories(response?.data || []));
-
+        if (isMounted) {
+          dispatch(setCategories(response?.data || []));
+        }
       } catch (error) {
-
-        toast.error(
-          error?.response?.data || "Failed to load categories"
-        );
-
+        if (isMounted) {
+          toast.error(
+            error?.response?.data || "Failed to load categories"
+          );
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchAllCategories();
 
-  }, []);
+    return () => {
+      isMounted = false;
+    };
+  }, [categories.length, dispatch]);
 
   const scroll = (direction) => {
     const amount = direction === "left" ? -300 : 300;

@@ -13,30 +13,27 @@ const QueryDetailsModal = ({
   fetchAllQueries,
 }) => {
   const [statuses, setStatuses] = useState([]);
-
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(
+    () => selectedQuery?.status || "",
+  );
 
   // --------------------------------------------------
   // FETCH STATUSES
   // --------------------------------------------------
 
   useEffect(() => {
-    setSelectedStatus(selectedQuery.status);
-
     const fetchStatus = async () => {
       try {
         const response = await getAllTicketStatus();
-
         setStatuses(response.data || []);
       } catch (error) {
         console.log(error.response?.data);
-
         toast.error("Failed to fetch statuses");
       }
     };
 
     fetchStatus();
-  }, [selectedQuery]);
+  }, []);
 
   // --------------------------------------------------
   // UPDATE STATUS

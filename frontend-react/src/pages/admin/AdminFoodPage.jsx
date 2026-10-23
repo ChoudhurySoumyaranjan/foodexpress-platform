@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import { getCategories } from "../../api/service/categoryService";
 import {
@@ -35,7 +35,7 @@ export default function AdminFoodPage() {
   const [pageSize, setPageSize] = useState(7);
   const [totalPages, setTotalPages] = useState(0);
 
-  const fetchFoods = async () => {
+  const fetchFoods = useCallback(async () => {
     try {
       const res = await fetchPaginatedFoods(currentPage, pageSize);
 
@@ -50,13 +50,15 @@ export default function AdminFoodPage() {
       }
 
       setFoods(res.data.content || []);
-      setPageSize(res.data.size);
+      if (res.data.size && res.data.size !== pageSize) {
+        setPageSize(res.data.size);
+      }
     } catch {
       toast.error("Failed to fetch foods");
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, pageSize]);
 
   const fetchCategories = async () => {
     try {
@@ -81,7 +83,7 @@ export default function AdminFoodPage() {
 
   useEffect(() => {
     fetchFoods();
-  }, [currentPage, pageSize]);
+  }, [fetchFoods]);
 
   useEffect(() => {
     fetchCategories();
@@ -383,10 +385,9 @@ export default function AdminFoodPage() {
               disabled={actionLoading}
               className={`
                 w-full py-2.5 rounded-xl text-sm font-semibold text-white transition
-                ${
-                  actionLoading
-                    ? "bg-orange-300 cursor-not-allowed"
-                    : "bg-orange-500 hover:bg-orange-600 shadow-sm shadow-orange-200"
+                ${actionLoading
+                  ? "bg-orange-300 cursor-not-allowed"
+                  : "bg-orange-500 hover:bg-orange-600 shadow-sm shadow-orange-200"
                 }
               `}
             >
@@ -470,11 +471,10 @@ export default function AdminFoodPage() {
                     key={index}
                     onClick={() => setCurrentPage(index)}
                     className={`rounded-lg px-4 py-2 text-sm font-medium
-            ${
-              currentPage === index
-                ? "bg-[#FC8019] text-white"
-                : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-            }`}
+            ${currentPage === index
+                        ? "bg-[#FC8019] text-white"
+                        : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
                   >
                     {index + 1}
                   </button>
@@ -663,10 +663,9 @@ export default function AdminFoodPage() {
                   disabled={actionLoading}
                   className={`
                     px-4 py-2 rounded-xl text-sm font-medium text-white transition
-                    ${
-                      actionLoading
-                        ? "bg-orange-300 cursor-not-allowed"
-                        : "bg-orange-500 hover:bg-orange-600 shadow-sm shadow-orange-200"
+                    ${actionLoading
+                      ? "bg-orange-300 cursor-not-allowed"
+                      : "bg-orange-500 hover:bg-orange-600 shadow-sm shadow-orange-200"
                     }
                   `}
                 >

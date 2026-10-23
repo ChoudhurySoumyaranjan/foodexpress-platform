@@ -21,6 +21,23 @@ const formatDate = (date) => {
 };
 
 const UserCardDetails = ({ data, setShowModal }) => {
+  useEffect(() => {
+    if (!data) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [data]);
+
+  useEffect(() => {
+    if (!data) return;
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setShowModal(false);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [data, setShowModal]);
+
   if (!data) return null;
 
   const {
@@ -42,21 +59,6 @@ const UserCardDetails = ({ data, setShowModal }) => {
       .slice(0, 2)
       .join("")
       .toUpperCase() || "?";
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === "Escape") setShowModal(false);
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [setShowModal]);
 
   return (
     <div

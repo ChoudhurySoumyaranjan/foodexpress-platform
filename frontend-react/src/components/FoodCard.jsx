@@ -144,11 +144,11 @@ const FoodCard = ({ data }) => {
         <div className="flex items-center justify-between mt-3 gap-2">
           <div className="flex items-baseline gap-1.5">
             <span className="font-bold text-[15px] text-gray-900">
-              ₹{Number(discountedPrice).toFixed(0)}
+              ₹{Number(discountedPrice ?? data?.price ?? 0).toFixed(0)}
             </span>
             {discount > 0 && (
               <span className="text-gray-400 line-through text-[12px]">
-                ₹{Number(data.price).toFixed(0)}
+                ₹{Number(data?.price ?? 0).toFixed(0)}
               </span>
             )}
           </div>

@@ -183,4 +183,22 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(
+            RuntimeException ex,
+            HttpServletRequest request) {
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(
+            Exception ex,
+            HttpServletRequest request) {
+        return new ResponseEntity<>(
+                buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }

@@ -1,5 +1,12 @@
 services:
 
+  redis:
+    image: redis:7-alpine
+    container_name: foodexpress-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
   backend:
     build:
       context: ./backend-spring
@@ -10,8 +17,14 @@ services:
     ports:
       - "5001:5001"
 
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
     environment:
       SPRING_PROFILES_ACTIVE: docker
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
 
       db_url: jdbc:mysql://host.docker.internal:3306/fullstack_ecom
       db_username: root
@@ -32,6 +45,11 @@ services:
       razorpay_key: rzp_test_TAJpjqlx1aPyOW
       razorpay_secret: CmZI8rVjQeoCJ3F6MPUtuZyv
       razorpay_currency: INR
+
+      FRONTEND_URL: http://localhost:5173
+
+    depends_on:
+      - redis
 
     restart: unless-stopped
 

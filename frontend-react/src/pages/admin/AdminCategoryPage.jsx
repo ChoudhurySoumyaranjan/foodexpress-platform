@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import {
   addCategory,
@@ -9,7 +9,6 @@ import {
 import Category from "../../components/Category";
 import Loader from "../../components/Loader";
 import { ImagePlus, X } from "lucide-react";
-import { CrueltyFree } from "@mui/icons-material";
 
 export default function AdminCategoryPage() {
   const [categoryName, setCategoryName] = useState({ name: "" });
@@ -24,7 +23,7 @@ export default function AdminCategoryPage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(5);
+  const pageSize = 5;
   const [totalPages, setTotalPages] = useState(0);
 
   const handleEdit = (cat) => {
@@ -34,7 +33,7 @@ export default function AdminCategoryPage() {
     setEditImage(null);
   };
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await getPaginatedCategories(currentPage, pageSize);
 
@@ -54,11 +53,11 @@ export default function AdminCategoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, pageSize]);
 
   useEffect(() => {
     fetchCategories();
-  }, [currentPage, pageSize]);
+  }, [fetchCategories]);
 
   const updateDeleteLocal = (id) => {
     setCategories((prev) => prev.filter((cat) => cat.id !== id));
@@ -241,10 +240,9 @@ export default function AdminCategoryPage() {
               className={`
                 w-full py-2.5 rounded-xl text-sm font-semibold text-white
                 transition
-                ${
-                  actionLoading
-                    ? "bg-orange-300 cursor-not-allowed"
-                    : "bg-orange-500 hover:bg-orange-600 shadow-sm shadow-orange-200"
+                ${actionLoading
+                  ? "bg-orange-300 cursor-not-allowed"
+                  : "bg-orange-500 hover:bg-orange-600 shadow-sm shadow-orange-200"
                 }
               `}
             >
@@ -329,11 +327,10 @@ export default function AdminCategoryPage() {
                       setCurrentPage(index);
                     }}
                     className={`rounded-lg px-4 py-2 text-sm font-medium
-            ${
-              currentPage === index
-                ? "bg-[#FC8019] text-white"
-                : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-            }`}
+            ${currentPage === index
+                        ? "bg-[#FC8019] text-white"
+                        : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
                   >
                     {index + 1}
                   </button>
@@ -462,10 +459,9 @@ export default function AdminCategoryPage() {
                   className={`
                     px-4 py-2 rounded-xl text-sm font-medium text-white
                     transition
-                    ${
-                      actionLoading
-                        ? "bg-orange-300 cursor-not-allowed"
-                        : "bg-orange-500 hover:bg-orange-600 shadow-sm shadow-orange-200"
+                    ${actionLoading
+                      ? "bg-orange-300 cursor-not-allowed"
+                      : "bg-orange-500 hover:bg-orange-600 shadow-sm shadow-orange-200"
                     }
                   `}
                 >

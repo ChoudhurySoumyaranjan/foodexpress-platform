@@ -1,7 +1,6 @@
 import React from "react";
 import CategorySlider from "../../components/CategorySlider";
 import OfferBanner from "../../components/OfferBanner";
-import RestaurantList from "../../components/RestaurantList";
 import HeroSection from "../../components/HeroSection";
 import FoodList from "../../components/FoodList";
 import SearchBar from "../../components/SearchBar";

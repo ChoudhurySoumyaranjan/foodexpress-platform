@@ -23,11 +23,15 @@ const cartSlice = createSlice({
           existingItem.quantity += 1;
         }
       } else {
+        const origPrice = Number(food.originalPrice || food.price || food.discountedPrice || 0);
+        const discPrice = Number(food.discountedPrice ?? food.price ?? 0);
         state.items.push({
           foodId: food.id,
           foodName: food.foodName,
           imageUrl: food.imageUrl,
-          discountedPrice: food.discountedPrice,
+          price: origPrice,
+          originalPrice: origPrice,
+          discountedPrice: discPrice,
           stock: food.stock,
           quantity: 1,
         });
